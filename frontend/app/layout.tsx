@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Quicksand } from 'next/font/google'
-
+import Link from 'next/link';
 import localFont from "next/font/local";
 import "./globals.css";
 
