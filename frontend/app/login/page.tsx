@@ -179,7 +179,7 @@ const Login: React.FC = () => {
                   fontSize: '20px', // Slightly bigger for the icon
                 }}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'} {/* Eye icon for show/hide */}
+                {showPassword ? '🙈' : '👁️'} {/* Eye icon for show/hide */}
               </button>
             </div>
 

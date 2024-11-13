@@ -3,6 +3,7 @@ import { CSSProperties } from 'react';
 
 const Home: React.FC = () => {
   return (
+
     <div style={styles.container}>
       <h1 style={styles.header}>Welcome</h1>
       <p style={styles.description}>Start your journey by logging in or registering</p>
