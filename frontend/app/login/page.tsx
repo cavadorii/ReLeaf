@@ -122,6 +122,7 @@ const Login: React.FC = () => {
     e.currentTarget.style.textDecoration = 'none';
   };
 
+
   // New state to toggle the password visibility
   const [showPassword, setShowPassword] = useState<boolean>(false); // Explicitly typing as boolean
 
@@ -181,6 +182,7 @@ const Login: React.FC = () => {
                 {showPassword ? '👁️' : '👁️‍🗨️'} {/* Eye icon for show/hide */}
               </button>
             </div>
+
           </div>
           <a href="#" style={forgotPasswordStyle}>
             Forgot Password?
