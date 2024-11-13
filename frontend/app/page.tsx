@@ -1,9 +1,16 @@
-import Login from "./components/Login/page"; // adjust this path if needed
 
-export default function Home() {
+import Link from 'next/link';
+
+const Home: React.FC = () => {
+  
   return (
     <div>
-      <Login/>
+      <h1>Welcome</h1>
+      <nav>
+        <Link href="/register">Register</Link>
+      </nav>
     </div>
   );
-}
+};
+
+export default Home;
