@@ -8,6 +8,7 @@ const Home: React.FC = () => {
       <h1>Welcome</h1>
       <nav>
         <Link href="/register">Register</Link>
+        <Link href="/login">Login</Link>
       </nav>
     </div>
   );

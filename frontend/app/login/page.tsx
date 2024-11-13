@@ -172,7 +172,7 @@ const Login: React.FC = () => {
           <div style={registerLinkStyle}>
             Don’t have an account?{' '}
             <a
-              href="#"
+              href="/register"
               style={registerLinkAnchorStyle}
               onMouseOver={handleRegisterLinkHover}
               onMouseOut={handleRegisterLinkOut}
