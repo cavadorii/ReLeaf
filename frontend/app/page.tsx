@@ -13,6 +13,7 @@ const Home: React.FC = () => {
         </Link>
         <Link href="/plant_me">
         </Link>
+        <Link href="/profile"></Link>
       </nav>
       <Link href="/login">
       <button style={styles.startButton}>Start</button>
