@@ -1,8 +1,7 @@
 'use client'; // This marks the component as a client-side component
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-//import Head from 'next/head'; // Import the Head component
 
 const Login: React.FC = () => {
   // Global container style
@@ -123,11 +122,17 @@ const Login: React.FC = () => {
     e.currentTarget.style.textDecoration = 'none';
   };
 
+
+  // New state to toggle the password visibility
+  const [showPassword, setShowPassword] = useState<boolean>(false); // Explicitly typing as boolean
+
+  // Toggle the password visibility with explicit return type (void)
+  const togglePasswordVisibility = (): void => {
+    setShowPassword((prevState) => !prevState);
+  };
+
   return (
-
     <>
-
-
       <div style={containerStyle}>
         <div style={loginBoxStyle}>
           <div className="logo">
@@ -151,13 +156,33 @@ const Login: React.FC = () => {
           </div>
           <div style={inputContainerStyle}>
             <label style={labelStyle}>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              style={inputStyle}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'} // Toggle password visibility
+                placeholder="Enter your password"
+                style={inputStyle}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility} // Toggle show password
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#789461',
+                  cursor: 'pointer',
+                  fontSize: '20px', // Slightly bigger for the icon
+                }}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'} {/* Eye icon for show/hide */}
+              </button>
+            </div>
+
           </div>
           <a href="#" style={forgotPasswordStyle}>
             Forgot Password?
