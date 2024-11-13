@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Head from 'next/head'; // Import the Head component
+//import Head from 'next/head'; // Import the Head component
 
 const Login: React.FC = () => {
   // Global container style
@@ -126,12 +126,7 @@ const Login: React.FC = () => {
   return (
 
     <>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Quicksand:wght@300..700&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
+
 
       <div style={containerStyle}>
         <div style={loginBoxStyle}>
