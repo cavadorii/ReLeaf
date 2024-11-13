@@ -9,7 +9,7 @@ const Home: React.FC = () => {
       <nav>
         <Link href="/login">Login</Link>
         <Link href="/register">Register</Link>
-        <Link href="/login">Login</Link>
+        <Link href="/plantMe">Plant Me</Link>
       </nav>
     </div>
   );
