@@ -1,5 +1,3 @@
-// routes/predictRoutes.js
-
 const express = require('express');
 const { handleTreePhotoPrediction } = require('../controllers/predictController');
 const multer = require('multer');
