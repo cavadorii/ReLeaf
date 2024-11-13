@@ -1,5 +1,3 @@
-// controllers/predictController.js
-
 const tf = require('@tensorflow/tfjs-node');
 const sharp = require('sharp');
 const { TreePhoto } = require('../models/tree_photo');
