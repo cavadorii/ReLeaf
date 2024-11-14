@@ -12,7 +12,7 @@ const Home: React.FC = () => {
         </Link>
         <Link href="/login">
         </Link>
-        <Link href="/plant_me">
+        <Link href="/plantMe">
         </Link>
         <Link href="/profile"></Link>
         <Link href="/event"></Link>

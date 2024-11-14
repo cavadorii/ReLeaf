@@ -1,15 +1,15 @@
 "use client";
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
-    phone: '',
+    role: '',
     password: '',
     confirmPassword: '',
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -20,15 +20,38 @@ const Register: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Basic validation
+
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    // Handle form submission logic here
-    console.log('Form data submitted: ', formData);
+
+    try {
+      // Send the data to the backend
+      const response = await axios.post('/api/signup', {
+        username: formData.username,
+        email: formData.email,
+        role: formData.role,
+        password: formData.password,
+      });
+
+      if (response.status === 201) {
+        alert("Signup successful!");
+        // Redirect or reset the form
+        setFormData({
+          username: '',
+          email: '',
+          role: '',
+          password: '',
+          confirmPassword: '',
+        });
+      }
+    } catch (error) {
+      console.error("There was an error during signup:", error);
+      alert("Error signing up. Please try again.");
+    }
   };
 
   return (
@@ -59,12 +82,12 @@ const Register: React.FC = () => {
         >
           <h2 style={{ color: '#000', textAlign: 'center' }}>Create New Account</h2>
 
-          <label style={{ color: '#333', display: 'block', marginTop: '10px' }}>Name</label>
+          <label style={{ color: '#333', display: 'block', marginTop: '10px' }}>Username</label>
           <input
             type="text"
-            name="name"
+            name="username"
             placeholder="Ex: Mihnea Bucur"
-            value={formData.name}
+            value={formData.username}
             onChange={handleChange}
             style={{
               width: '100%',
@@ -75,7 +98,7 @@ const Register: React.FC = () => {
               backgroundColor: '#f0e6c9',
               color: '#333',
             }}
-            aria-label="Full Name"
+            aria-label="Username"
           />
 
           <label style={{ color: '#333', display: 'block', marginTop: '10px' }}>Email Address</label>
@@ -97,12 +120,12 @@ const Register: React.FC = () => {
             aria-label="Email Address"
           />
 
-          <label style={{ color: '#333', display: 'block', marginTop: '10px' }}>Phone Number</label>
+          <label style={{ color: '#333', display: 'block', marginTop: '10px' }}>Role</label>
           <input
-            type="tel"
-            name="phone"
-            placeholder="+40 99887 76655"
-            value={formData.phone}
+            type="text"
+            name="role"
+            placeholder="Volunteer"
+            value={formData.role}
             onChange={handleChange}
             style={{
               width: '100%',
@@ -113,7 +136,7 @@ const Register: React.FC = () => {
               backgroundColor: '#f0e6c9',
               color: '#333',
             }}
-            aria-label="Phone Number"
+            aria-label="Role"
           />
 
           <label style={{ color: '#333', display: 'block', marginTop: '10px' }}>Password</label>
