@@ -153,7 +153,7 @@ const Register: React.FC = () => {
           <div style={{ marginBottom: '20px', textAlign: 'left', color: '#789461' }}>
             <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Password</label>
             <div style={{ position: 'relative' }}>
-            <input
+              <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
                 value={password}
