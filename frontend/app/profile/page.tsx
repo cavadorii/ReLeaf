@@ -74,36 +74,18 @@ const Profile: React.FC = () => {
               <label style={{ color: '#333', display: 'block', fontSize: '18px' }}>
                 {field.charAt(0).toUpperCase() + field.slice(1)}
               </label>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {/* Show/Hide Password Toggle */}
-                {field === 'password' && (
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: '#526E48',
-                      fontSize: '22px',
-                      marginRight: '10px',
-                    }}
-                    aria-label={showPassword ? '🙈' : '👁️'}
-                  >
-                    {showPassword ? '🙈' : '👁️'}
-                  </button>
-                )}
+              <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                 <input
                   type={field === 'password' && !showPassword ? 'password' : 'text'}
                   name={field}
-                  disabled={!editMode[field as keyof typeof editMode]}
+                  disabled={field === 'role' || field === 'user' || !editMode[field as keyof typeof editMode]}
                   value={formData[field as keyof typeof formData]}
                   onChange={handleChange}
                   style={{
-                    width: 'calc(100% - 90px)', // Adjust width to accommodate the icons
+                    width: '100%',
                     padding: '15px',
                     marginTop: '8px',
-                    borderRadius: '8px 0 0 8px',
+                    borderRadius: '8px',
                     border: '1px solid #ccc',
                     backgroundColor: editMode[field as keyof typeof editMode] ? '#f0e6c9' : '#e0e0e0',
                     color: '#333',
@@ -111,26 +93,50 @@ const Profile: React.FC = () => {
                   }}
                   aria-label={field.charAt(0).toUpperCase() + field.slice(1)}
                 />
-                <button
-                  type="button"
-                  onClick={() => handleEditToggle(field as keyof typeof editMode)}
-                  style={{
-                    width: '45px',
-                    height: '45px',
-                    backgroundColor: '#f0e6c9',
-                    border: 'none',
-                    marginTop: '8px',
-                    borderRadius: '0 8px 8px 0',
-                    cursor: 'pointer',
-                    fontSize: '22px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                  aria-label={`Edit ${field}`}
-                >
-                  ✏️
-                </button>
+                {/* Button container for alignment */}
+                <div style={{ display: 'flex', alignItems: 'center', position: 'absolute', right: '10px' }}>
+                  {/* Show/Hide Password Toggle */}
+                  {field === 'password' && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#526E48',
+                        fontSize: '22px',
+                        marginRight: '5px',  // Adds spacing between the buttons
+                      }}
+                      aria-label={showPassword ? '🙈' : '👁️'}
+                    >
+                      {showPassword ? '🙈' : '👁️'}
+                    </button>
+                  )}
+                  {/* Edit button */}
+                  {field !== 'role' && field !== 'user' && (
+                    <button
+                      type="button"
+                      onClick={() => handleEditToggle(field as keyof typeof editMode)}
+                      style={{
+                        width: '45px',
+                        height: '45px',
+                        backgroundColor: '#f0e6c9',
+                        border: 'none',
+                        marginTop: '8px',
+                        borderRadius: '0 8px 8px 0',
+                        cursor: 'pointer',
+                        fontSize: '22px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      aria-label={`Edit ${field}`}
+                    >
+                      ✏️
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
