@@ -4,12 +4,12 @@ import axios from 'axios';
 import Image from 'next/image';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [username, setusername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setusername(e.target.value);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,9 +20,9 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      // Send the email and password to the backend
+      
       const response = await axios.post('http://localhost:5000/api/auth/login', {
-        email,
+        username,
         password,
       });
 
@@ -64,10 +64,10 @@ const Login: React.FC = () => {
           <div style={{ marginBottom: '20px', textAlign: 'left', color: '#789461' }}>
             <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Email</label>
             <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={handleEmailChange}
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={handleUsernameChange}
               style={{
                 width: '100%',
                 padding: '12px',
