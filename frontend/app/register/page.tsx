@@ -33,8 +33,8 @@ const Register: React.FC = () => {
       const response = await axios.post('http://localhost:5000/api/auth/signup', {
         username: formData.username,
         email: formData.email,
-        role: formData.role,
         password: formData.password,
+        role: formData.role,
       });
 
       if (response.status === 201) {
