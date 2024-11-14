@@ -30,7 +30,7 @@ const Register: React.FC = () => {
 
     try {
       // Send the data to the backend
-      const response = await axios.post('/api/signup', {
+      const response = await axios.post('http://localhost:5000/api/auth/signup', {
         username: formData.username,
         email: formData.email,
         role: formData.role,
@@ -86,7 +86,7 @@ const Register: React.FC = () => {
           <input
             type="text"
             name="username"
-            placeholder="Ex: Mihnea Bucur"
+            placeholder="mihneabucur"
             value={formData.username}
             onChange={handleChange}
             style={{
