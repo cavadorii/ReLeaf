@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const Login: React.FC = () => {
   const [username, setusername] = useState('');
