@@ -3,6 +3,8 @@ import { Quicksand } from 'next/font/google'
 import Link from 'next/link';
 import localFont from "next/font/local";
 import "./globals.css";
+import { SidebarProvider, SidebarBody } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,7 +37,15 @@ export default function RootLayout({
       <body
         className={`${quicksand.className} ${geistSans.variable} ${geistMono.variable}  antialiased`}
       >
-        {children}
+          <div className="flex flex-row min-h-screen w-full">
+            <AppSidebar/> {/* Adjust width as needed */}
+            <div className="flex flex-col flex-1 justify-between items-center">
+              <main className="flex-grow w-full">
+                {children}
+              </main>
+            </div>
+          </div>
+
       </body>
     </html>
   );
