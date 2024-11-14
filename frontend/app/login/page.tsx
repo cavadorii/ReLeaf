@@ -5,12 +5,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const Login: React.FC = () => {
-  const [username, setusername] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setusername(e.target.value);
+    setUsername(e.target.value);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
