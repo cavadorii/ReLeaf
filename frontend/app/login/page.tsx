@@ -3,14 +3,17 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [username, setusername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+    setusername(e.target.value);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +24,6 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         username,
         password,
@@ -36,26 +38,26 @@ const Login: React.FC = () => {
     }
   };
 
-  // Additional styles and methods omitted for brevity...
-
   return (
     <div style={{
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '100vh',
-      backgroundColor: '#f4f7fa',
       padding: '20px',
       fontFamily: '"Quicksand", sans-serif',
+      backgroundImage: 'url("/forest.jpg")',  
+      backgroundSize: 'cover',  
+      backgroundPosition: 'center', 
     }}>
       <div style={{
-        backgroundColor: '#CBD2A4',
-        borderRadius: '10px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
-        width: '100%',
-        maxWidth: '400px',
-        padding: '40px',
-        textAlign: 'center',
+        backgroundColor: '#CBD2A4',  
+        borderRadius: '10px',         
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)', 
+        width: '100%',               
+        maxWidth: '400px',            
+        padding: '40px',              
+        textAlign: 'center',         
       }}>
         <div className="logo">
           <Image src="/logo.png" alt="Logo" width={75} height={75} style={{ marginBottom: '30px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
@@ -100,34 +102,25 @@ const Login: React.FC = () => {
                 }}
               />
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: '#789461',
-                  cursor: 'pointer',
-                  fontSize: '20px',
-                }}
-              >
-                {showPassword ? '🙈' : '👁️'}
-              </button>
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          style={{
+            position: 'absolute',
+            right: '10px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'none',
+            border: 'none',
+            color: '#789461',
+            cursor: 'pointer',
+            fontSize: '20px',
+          }}
+        >
+          {showPassword ? <VisibilityOff /> : <Visibility />}  
+        </button>
             </div>
           </div>
-          <a href="#" style={{
-            display: 'block',
-            marginTop: '10px',
-            color: '#54473F',
-            textDecoration: 'none',
-            fontSize: '14px',
-            fontFamily: '"Quicksand", sans-serif',
-          }}>
-            Forgot Password?
-          </a>
+
           <button
             type="submit"
             style={{
@@ -159,8 +152,8 @@ const Login: React.FC = () => {
             </a>
           </div>
         </form>
-      </div>
-    </div>
+      </div> 
+    </div> 
   );
 };
 
