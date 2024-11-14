@@ -37,6 +37,7 @@ const PlantMePage: React.FC = () => {
       borderRadius: '10px',
       cursor: 'pointer',
       marginBottom: '20px',
+      marginTop: 'auto',
     },
   };
 
