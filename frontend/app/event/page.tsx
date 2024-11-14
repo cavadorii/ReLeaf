@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-const EventPage: React.FC = () => {
+const Event: React.FC = () => {
     // Page container style
     const containerStyle: React.CSSProperties = {
       display: 'flex',
@@ -111,4 +111,4 @@ const EventPage: React.FC = () => {
   );
 };
 
-export default EventPage;
+export default Event;
