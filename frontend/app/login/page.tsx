@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 const Login: React.FC = () => {
   const [username, setusername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
+  const router = useRouter();
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setusername(e.target.value);
   };
@@ -27,8 +28,7 @@ const Login: React.FC = () => {
       });
 
       if (response.status === 200) {
-        alert("Login successful!");
-        // Handle login success, such as redirecting to a different page or saving the token
+        router.push('/plantMe');
       }
     } catch (error) {
       console.error("Login error:", error);

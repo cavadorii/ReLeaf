@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { useRouter } from 'next/router';
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     username: '',
@@ -12,7 +12,7 @@ const Register: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -38,15 +38,7 @@ const Register: React.FC = () => {
       });
 
       if (response.status === 201) {
-        alert("Signup successful!");
-        // Redirect or reset the form
-        setFormData({
-          username: '',
-          email: '',
-          role: '',
-          password: '',
-          confirmPassword: '',
-        });
+        router.push('/login');
       }
     } catch (error) {
       console.error("There was an error during signup:", error);
