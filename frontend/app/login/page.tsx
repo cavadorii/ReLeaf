@@ -7,13 +7,13 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [username, setusername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+    setusername(e.target.value);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {

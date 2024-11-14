@@ -1,5 +1,3 @@
-// app/plantMe/page.tsx
-
 'use client';
 
 import React from 'react';
@@ -48,7 +46,22 @@ const PlantMePage: React.FC = () => {
       {/* Map Component */}
       <MapComponent />
 
-      <button style={styles.contributeButton}>Contribute</button>
+      <button
+        style={{
+          width: '100%',
+          padding: '14px',
+          fontSize: '18px',
+          color: 'white',
+          backgroundColor: '#54473F',
+          border: 'none',
+          borderRadius: '10px',
+          cursor: 'pointer',
+          fontFamily: '"Quicksand", sans-serif',
+          marginBottom: '20px',
+        }}
+      >
+        Contribute
+      </button>
     </div>
   );
 };

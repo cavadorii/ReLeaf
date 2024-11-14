@@ -14,6 +14,7 @@ const Register: React.FC = () => {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
@@ -23,6 +24,12 @@ const Register: React.FC = () => {
       [e.target.name]: e.target.value,
     });
   };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,8 +156,8 @@ const Register: React.FC = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
+                value={password}
+                onChange={handlePasswordChange}
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -217,7 +224,7 @@ const Register: React.FC = () => {
                   fontSize: '20px',
                 }}
               >
-          {showPassword ? <VisibilityOff /> : <Visibility />}  
+          {showConfirmPassword ? <VisibilityOff /> : <Visibility />}  
           </button>
             </div>
           </div>
