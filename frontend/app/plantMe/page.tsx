@@ -43,25 +43,7 @@ const PlantMePage: React.FC = () => {
       cursor: 'pointer',
       marginBottom: '20px',
     },
-    footer: {
-      display: 'flex',
-      justifyContent: 'space-around',
-      width: '100%',
-      position: 'fixed', // TypeScript will now infer this as the literal 'fixed'
-      bottom: '0',
-      backgroundColor: '#4a5b3e', // Dark green for footer
-      padding: '10px 0',
-    },
-    footerButton: {
-      fontSize: '16px',
-      color: 'white',
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-    },
-    activeFooterButton: {
-      color: '#74c67a', // Highlight color for active button
-    },
+
   } as const; // Use 'as const' here
 
   return (
@@ -72,12 +54,6 @@ const PlantMePage: React.FC = () => {
       <div style={styles.mapPlaceholder}>Map Area</div>
 
       <button style={styles.contributeButton}>Contribute</button>
-
-      <footer style={styles.footer}>
-        <button style={styles.footerButton}>Events</button>
-        <button style={{ ...styles.footerButton, ...styles.activeFooterButton }}>Home</button>
-        <button style={styles.footerButton}>Profile</button>
-      </footer>
     </div>
   );
 };
