@@ -16,6 +16,7 @@ const Home: React.FC = () => {
         </Link>
         <Link href="/profile"></Link>
         <Link href="/event"></Link>
+        <Link href="/uploadTreePhoto"></Link>
       </nav>
       <Link href="/login">
       <button style={styles.startButton}>Start</button>
