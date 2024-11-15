@@ -2,13 +2,26 @@
 
 const tf = require('@tensorflow/tfjs-node');
 const sharp = require('sharp');
-const { TreePhoto } = require('../models/tree_photo');
+const { TreePhoto } = require('./../models/three_photo');
+const path = require('path');
+
 
 let model;
+class CustomL2Regularizer extends tf.regularizers.l2 {
+    static className = 'L2';
+
+    constructor(config) {
+        super({ l2: config.l2 || 0.01 });
+    }
+}
+
+// Register the custom L2 regularizer
+tf.serialization.registerClass(CustomL2Regularizer);
 
 // Load model when server starts
 async function loadModel() {
-    model = await tf.loadLayersModel('');
+    const modelPath = path.resolve(__dirname, './../ml_model/model.json');
+    model = await tf.loadLayersModel(`file://${modelPath}`);
     console.log("Model loaded successfully.");
 }
 loadModel();
@@ -33,15 +46,6 @@ async function handleTreePhotoPrediction(req, res) {
         const imagePath = req.file.path;
         const hasTree = await predictTreePresence(imagePath);
 
-        const treePhoto = new TreePhoto({
-            registration_id: req.body.registration_id,
-            user_id: req.body.user_id,
-            event_id: req.body.event_id,
-            photo_url: imagePath,
-            is_valid: hasTree
-        });
-
-        await treePhoto.save();
         res.json({ message: "Tree photo processed successfully", hasTree });
     } catch (error) {
         console.error("Prediction error:", error);
