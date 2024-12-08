@@ -1,21 +1,40 @@
 'use client'; // This marks the component as a client-side component
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Event: React.FC = () => {
-    // Page container style
-    const containerStyle: React.CSSProperties = {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'column',
-      backgroundColor: '#f4f7fa',
-      padding: '20px',
-      fontFamily: '"Quicksand", sans-serif',
-      minHeight: '100vh',
+  const [events, setEvents] = useState<Array<{ id: string; title: string; description: string; date: string }>>([]);
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState<string | null>(null); 
+
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      
+        const response = await fetch('/api/events/getallevents'); 
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const data = await response.json();
+        setEvents(data); 
+        setLoading(false);
     };
 
-  // Events grid style
+    fetchEvents();
+  }, []);
+
+  // Styles
+  const containerStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    backgroundColor: '#f4f7fa',
+    padding: '20px',
+    fontFamily: '"Quicksand", sans-serif',
+    minHeight: '100vh',
+  };
+
   const gridStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
@@ -24,7 +43,6 @@ const Event: React.FC = () => {
     maxWidth: '1200px',
   };
 
-  // Individual event box style
   const eventBoxStyle: React.CSSProperties = {
     backgroundColor: '#CBD2A4',
     borderRadius: '10px',
@@ -53,9 +71,8 @@ const Event: React.FC = () => {
     color: '#789461',
   };
 
-  // Upcoming events header box style
   const headerBoxStyle: React.CSSProperties = {
-    backgroundColor: '#CBD2A4', // Light transparent background
+    backgroundColor: '#CBD2A4',
     padding: '15px 30px',
     borderRadius: '10px',
     textAlign: 'center',
@@ -66,7 +83,7 @@ const Event: React.FC = () => {
     color: '#54473F',
     position: 'relative',
     zIndex: 1,
-    top: '-50px', // Move the title slightly upwards
+    top: '-50px',
   };
 
   const handleMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -77,36 +94,30 @@ const Event: React.FC = () => {
     e.currentTarget.style.transform = 'scale(1)';
   };
 
-  // Placeholder data for events (to be replaced with real data from the database)
-  const events = Array.from({ length: 10 }, (_, index) => ({
-    id: index + 1,
-    title: `Event ${index + 1}`,
-    description: 'This is a brief description of the event.',
-    date: '2024-11-15',
-  }));
-
+  // Render loading, error, or events grid
   return (
     <div style={containerStyle}>
-      {/* Upcoming Events Title */}
-      <div style={headerBoxStyle}>
-        Upcoming Events
-      </div>
+      <div style={headerBoxStyle}>Upcoming Events</div>
 
-      {/* Events Grid */}
-      <div style={gridStyle}>
-        {events.map(event => (
-          <div
-            key={event.id}
-            style={eventBoxStyle}
-            onMouseOver={handleMouseOver}
-            onMouseOut={handleMouseOut}
-          >
-            <h2 style={eventTitleStyle}>{event.title}</h2>
-            <p style={eventDescriptionStyle}>{event.description}</p>
-            <p style={eventDateStyle}>Date: {event.date}</p>
-          </div>
-        ))}
-      </div>
+      {loading && <p>Loading events...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {!loading && !error && (
+        <div style={gridStyle}>
+          {events.map((event) => (
+            <div
+              key={event.id}
+              style={eventBoxStyle}
+              onMouseOver={handleMouseOver}
+              onMouseOut={handleMouseOut}
+            >
+              <h2 style={eventTitleStyle}>{event.title}</h2>
+              <p style={eventDescriptionStyle}>{event.description}</p>
+              <p style={eventDateStyle}>Date: {new Date(event.date).toLocaleDateString()}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

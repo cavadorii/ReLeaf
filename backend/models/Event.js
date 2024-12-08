@@ -36,6 +36,10 @@ async function getEventById(id) {
   return await Event.findById(id).populate('association_id').populate('volunteers.user_id');
 }
 
+async function getAllEvents() {
+  return await Event.find().populate('association_id').populate('volunteers.user_id');
+}
+
 //Update by ID
 async function updateEvent(id, data) {
   return await Event.findByIdAndUpdate(id, data, { new: true });
@@ -46,4 +50,4 @@ async function deleteEvent(id) {
   return await Event.findByIdAndDelete(id);
 }
 
-module.exports = { Event, createEvent, getEventById, updateEvent, deleteEvent };
+module.exports = { Event, createEvent, getEventById, updateEvent, deleteEvent,getAllEvents };
