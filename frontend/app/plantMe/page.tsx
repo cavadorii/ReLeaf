@@ -2,6 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 // Dynamically import MapComponent with SSR disabled
 const MapComponent = dynamic(() => import('../components/MapComponent'), {
@@ -46,22 +47,24 @@ const PlantMePage: React.FC = () => {
       {/* Map Component */}
       <MapComponent />
 
-      <button
-        style={{
-          width: '100%',
-          padding: '14px',
-          fontSize: '18px',
-          color: 'white',
-          backgroundColor: '#54473F',
-          border: 'none',
-          borderRadius: '10px',
-          cursor: 'pointer',
-          fontFamily: '"Quicksand", sans-serif',
-          marginBottom: '20px',
-        }}
-      >
-        Contribute
-      </button>
+      <Link href="/uploadTreePhoto">
+        <button
+          style={{
+            width: '100%',
+            padding: '14px',
+            fontSize: '18px',
+            color: 'white',
+            backgroundColor: '#54473F',
+            border: 'none',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            fontFamily: '"Quicksand", sans-serif',
+            marginBottom: '20px',
+          }}
+        >
+          Contribute
+        </button>
+      </Link>
     </div>
   );
 };
