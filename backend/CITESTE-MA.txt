@@ -1,0 +1,8 @@
+Ca sa faci request sa pui poza sa vezi daca este sapling sau nu:
+deschizi postman
+new post request
+dai la body
+selectezi form data
+Key = image
+Value -> de acolo dai upload la file
+http://localhost:5000/api/predict/predict-tree
