@@ -1,29 +1,14 @@
-'use client'; // This marks the component as a client-side component
+'use client'; // Mark as a client-side component
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 
-interface EventProps {
-  id: number;
-  title: string;
-  description: string;
-  location: {
-    address: string;
-    coordinates: {
-      latitude: number;
-      longitude: number;
-    };
-  };
-  start_date: string;
-  end_date: string;
-}
-
-const EventDetail: React.FC = () => {
-  const [event, setEvent] = useState<EventProps | null>(null);
-  const router = useRouter();
-  const { id } = router.query; // Get the dynamic event ID from the URL
+const EventDetails: React.FC = () => {
+  const [event, setEvent] = useState<any | null>(null);
 
   useEffect(() => {
-    // Mock data for event details (in real use case, fetch from a database)
+    const currentId = localStorage.getItem('Id');
+    const id = Number(currentId); // Convert ID to a number
+
+    // Mock events data (this should be replaced with real data fetching in a real app)
     const events = [
       {
         id: 1,
@@ -60,15 +45,30 @@ const EventDetail: React.FC = () => {
       },
     ];
 
-    // Find event by ID
-    const eventDetails = events.find((event) => event.id === parseInt(id as string));
-    if (eventDetails) {
-      setEvent(eventDetails);
+    // Find the event by ID and update state
+    if (id) {
+      const selectedEvent = events.find((event) => event.id === id);
+      setEvent(selectedEvent);
     }
-  }, [id]);
+  }, []); // Add empty dependency array to run only once
 
-  if (!event) return <p>Loading...</p>;
+  if (!event) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div style={{ padding: '20px', fontFamily: '"Quicksand", sans-serif' }}>
-     
+    <div style={{ padding: '20px', fontFamily: '"Quicksand", sans-serif', textAlign: 'center' }}>
+      <h1 style={{ fontSize: '24px', color: '#54473F' }}>{event.title}</h1>
+      <p style={{ fontSize: '16px', color: '#555' }}>{event.description}</p>
+      <p style={{ fontSize: '14px', color: '#789461' }}>
+        Location: {event.location.address}
+      </p>
+      <p style={{ fontSize: '14px', color: '#789461' }}>
+        Date: {new Date(event.start_date).toLocaleDateString()} -{' '}
+        {new Date(event.end_date).toLocaleDateString()}
+      </p>
+    </div>
+  );
+};
+
+export default EventDetails;
