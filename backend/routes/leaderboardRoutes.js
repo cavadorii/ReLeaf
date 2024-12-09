@@ -4,6 +4,7 @@ const leaderboardController = require('../controllers/leaderboardController');
 const router = express.Router();
 
 router.post('/', leaderboardController.createEntry); 
+router.get('/',leaderboardController.getAllEntries);
 router.get('/:id', leaderboardController.getEntryById);
 router.put('/:id', leaderboardController.updateEntryById); 
 router.delete('/:id', leaderboardController.deleteEntryById); 
