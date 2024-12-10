@@ -169,6 +169,8 @@ const UploadTreePhoto: React.FC = () => {
               borderRadius: '8px',
               cursor: 'pointer',
               fontFamily: '"Quicksand", sans-serif',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+              transition: 'background-color 0.3s, transform 0.3s',
             }}
           >
             {loading ? 'Uploading...' : 'Submit'}

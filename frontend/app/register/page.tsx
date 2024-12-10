@@ -178,6 +178,7 @@ const Register: React.FC = () => {
                   color: '#789461',
                   cursor: 'pointer',
                   fontSize: '20px',
+                  
                 }}
               >
           {showPassword ? <VisibilityOff /> : <Visibility />}  
@@ -237,6 +238,8 @@ const Register: React.FC = () => {
               borderRadius: '8px',
               cursor: 'pointer',
               fontFamily: '"Quicksand", sans-serif',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+              transition: 'background-color 0.3s, transform 0.3s',
             }}
           >
             Register
