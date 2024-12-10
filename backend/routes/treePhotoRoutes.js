@@ -15,39 +15,41 @@ module.exports = router;
 
 // Get a tree photo by ID
 router.get('/:id', async (req, res) => {
+  console.log('Route parameter:', req.params); // Log the entire params object
   try {
-    const treePhoto = await TreePhotoSchemaController.getTreePhotoById(req.params.id);
-    res.status(200).json(treePhoto);
+    await TreePhotoSchemaController.getTreePhotoById(req, res);
   } catch (error) {
-    console.error('Error fetching tree photo:', error);
-    res.status(404).json({ error: error.message });
+    console.error('Error in route handler:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
 // Update a tree photo by ID
 router.put('/:id', async (req, res) => {
   try {
-    const updatedTreePhoto = await TreePhotoSchemaController.updateTreePhotoById(
-      req.params.id,
-      req.body
-    );
-    res.status(200).json(updatedTreePhoto);
+    await TreePhotoSchemaController.updateTreePhotoById(req, res); // Pass req and res correctly
   } catch (error) {
-    console.error('Error updating tree photo:', error);
-    res.status(400).json({ error: error.message });
+    console.error('Error updating tree photo:', error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 
 // Delete a tree photo by ID
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedTreePhoto = await TreePhotoSchemaController.deleteTreePhotoById(
-      req.params.id
-    );
-    res.status(200).json(deletedTreePhoto);
+    await TreePhotoSchemaController.deleteTreePhotoById(req, res); // Pass req and res
   } catch (error) {
-    console.error('Error deleting tree photo:', error);
-    res.status(404).json({ error: error.message });
+    console.error('Error in delete route:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+router.get('/', async (req, res) => {
+  try {
+    // Properly forward req and res to the controller
+    await TreePhotoSchemaController.getAllTreePhotos(req, res);
+  } catch (error) {
+    console.error('Error fetching tree photos:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 

@@ -13,6 +13,7 @@ const usersRoutes = require('./routes/usersRoutes');
 const leaderboardRoutes=require('./routes/leaderboardRoutes')
 const certificateRoutes=require('./routes/certificateRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const registrationRoutes = require('./routes/registrationRoutes');
 
 const app = express();
 app.use(cors());
@@ -26,6 +27,7 @@ app.use('/api/tree-photos',treePhotoRoutes);
 app.use('/api/users',usersRoutes);
 app.use('/api/leaderboard',leaderboardRoutes)
 app.use('/api/events', eventRoutes);
+app.use('/api/registrations',registrationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
