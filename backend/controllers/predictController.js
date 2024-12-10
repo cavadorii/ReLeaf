@@ -20,10 +20,8 @@ tf.serialization.registerClass(CustomL2Regularizer);
 
 // Load model when server starts
 async function loadModel() {
-    // Use the WSL path to the model.json
-    const modelPath = `\\\\wsl.localhost\\Ubuntu\\home\\sebastian\\MachineLearning\\models\\tfjs_sapling_detector\\model.json`;
-    
     try {
+        const modelPath = path.resolve(__dirname, './../ml_model/model.json');
         model = await tf.loadLayersModel(`file://${modelPath}`);
         console.log("Model loaded successfully.");
     } catch (error) {
