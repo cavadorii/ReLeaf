@@ -14,7 +14,11 @@ const User = {
 
   findByUsername: async (username) => {
     return await userCollection.findOne({ username });
-  }
+  },
+
+  findById: async (id) => {
+    return (await userCollection.findOne(id)).username;
+  },
 };
 
 module.exports = User;
