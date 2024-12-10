@@ -1,5 +1,6 @@
 Ca sa faci request sa pui poza sa vezi daca este sapling sau nu:
 deschizi postman
+bei o bere
 new post request
 dai la body
 selectezi form data

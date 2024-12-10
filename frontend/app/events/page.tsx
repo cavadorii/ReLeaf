@@ -1,8 +1,14 @@
 'use client'; // This marks the component as a client-side component
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const Event: React.FC = () => {
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const eventsPerPage = 4;
+
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
@@ -12,6 +18,13 @@ const Event: React.FC = () => {
     padding: '20px',
     fontFamily: '"Quicksand", sans-serif',
     minHeight: '100vh',
+  };
+
+  const headerStyle: React.CSSProperties = {
+    fontSize: '24px',
+    marginBottom: '100px',
+    color: '#54473F',
+    fontWeight: 'bold',
   };
 
   const gridStyle: React.CSSProperties = {
@@ -51,58 +64,83 @@ const Event: React.FC = () => {
     color: '#555',
   };
 
-  const handleEventClick = (id: Number) => {
-    localStorage.setItem('Id', id.toString());
+  const paginationStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '20px',
+    gap: '10px',
   };
 
-  const events = [
-    {
-      id: 1,
-      title: 'Community Cleanup',
-      location: {
-        address: '123 Main St, Springfield',
-      },
-      start_date: '2024-11-15T09:00:00Z',
-      end_date: '2024-11-15T12:00:00Z',
-    },
-    {
-      id: 2,
-      title: 'Food Drive',
-      location: {
-        address: '456 Elm St, Springfield',
-      },
-      start_date: '2024-11-20T10:00:00Z',
-      end_date: '2024-11-20T14:00:00Z',
-    },
-    {
-      id: 3,
-      title: 'Tree Planting',
-      location: {
-        address: '789 Oak St, Springfield',
-      },
-      start_date: '2024-11-25T08:00:00Z',
-      end_date: '2024-11-25T11:00:00Z',
-    },
-    
-  ];
+  const arrowButtonStyle: React.CSSProperties = {
+    padding: '10px 15px',
+    backgroundColor: '#54473F',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+  };
+
+  const handleEventClick = (id: string) => {
+    localStorage.setItem('Id', id);
+  };
+
+  const paginate = (direction: 'next' | 'prev') => {
+    if (direction === 'next' && currentPage < Math.ceil(events.length / eventsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    } else if (direction === 'prev' && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/events');
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        const data = await response.json();
+        setEvents(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  if (loading) {
+    return <div style={containerStyle}>Loading events...</div>;
+  }
+
+  if (error) {
+    return <div style={containerStyle}>Error: {error}</div>;
+  }
+
+  // Pagination logic
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
 
   return (
     <div style={containerStyle}>
-      <div style={{ fontSize: '24px', marginBottom: '20px', color: '#54473F', fontWeight: 'bold' }}>
-        Upcoming Events
-      </div>
+      <div style={headerStyle}>Upcoming Events</div>
       <div style={gridStyle}>
-        {events.map((event) => (
-          <div key={event.id} style={eventBoxStyle}>
+        {currentEvents.map((event) => (
+          <div key={event._id} style={eventBoxStyle}>
             <h2 style={eventTitleStyle}>{event.title}</h2>
             <p style={eventDateStyle}>
               Date: {new Date(event.start_date).toLocaleDateString()} -{' '}
               {new Date(event.end_date).toLocaleDateString()}
             </p>
-            <p style={eventLocationStyle}>Location: {event.location.address}</p>
+            <p style={eventLocationStyle}>Location: {event.location?.address || 'Unknown'}</p>
             <Link href={`/event/`} passHref>
               <button
-                onClick={() => handleEventClick(event.id)}
+                onClick={() => handleEventClick(event._id)}
                 style={{
                   padding: '10px 20px',
                   backgroundColor: '#54473F',
@@ -117,6 +155,22 @@ const Event: React.FC = () => {
             </Link>
           </div>
         ))}
+      </div>
+      <div style={paginationStyle}>
+        <button
+          style={arrowButtonStyle}
+          onClick={() => paginate('prev')}
+          disabled={currentPage === 1}
+        >
+          &lt; Prev
+        </button>
+        <button
+          style={arrowButtonStyle}
+          onClick={() => paginate('next')}
+          disabled={currentPage === Math.ceil(events.length / eventsPerPage)}
+        >
+          Next &gt;
+        </button>
       </div>
     </div>
   );

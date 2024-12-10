@@ -12,7 +12,7 @@ import {
 
 const items = [
   { title: "Home", url: "/plantMe", icon: <Home /> },
-  { title: "Event", url: "/event", icon: <ReceiptText /> },
+  { title: "Event", url: "/events", icon: <ReceiptText /> },
   { title: "Profile", url: "/profile", icon: <User /> },
 ];
 
