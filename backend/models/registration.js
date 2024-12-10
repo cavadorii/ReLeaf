@@ -1,110 +1,113 @@
-// Import mongoose
-const mongoose = require('mongoose');
+const { client } = require('../config/database');
+const { ObjectId } = require('mongodb');
 
-// Define the registration schema
-const registrationSchema = new mongoose.Schema({
-  event_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Event',
-    required: true
+const registrationCollection = client.db('Cluster0').collection('registrations');
+
+const registration = {
+  create: async (data) => {
+    const eventId = ObjectId.isValid(data.event_id) ? new ObjectId(data.event_id) : null;
+    const userId = ObjectId.isValid(data.user_id) ? new ObjectId(data.user_id) : null;
+
+    if (!eventId || !userId) {
+      throw new Error('Invalid event_id or user_id');
+    }
+
+    const registrationData = {
+      ...data,
+      event_id: eventId,
+      user_id: userId,
+      status: data.status || 'pending',
+      registered_at: new Date(),
+      points_awarded: data.points_awarded || 0,
+    };
+
+    const result = await registrationCollection.insertOne(registrationData);
+    return {
+      _id: result.insertedId,
+      ...registrationData,
+    };
   },
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ['completed', 'pending', 'canceled'],
-    default: 'pending',
-    required: true
-  },
-  registered_at: {
-    type: Date,
-    default: Date.now
-  },
-  points_awarded: {
-    type: Number,
-    default: 0,
-    min: 0
-  }
-});
 
-// Create indexes for efficient querying on event_id and user_id
-registrationSchema.index({ event_id: 1, user_id: 1 }, { unique: true });
+  findById: async (id) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid registration ID');
+    }
 
-// Compile the model
-const Registration = mongoose.model('Registration', registrationSchema);
-
-// CRUD Operations
-
-// Create a new registration
-async function createRegistration(data) {
-  try {
-    const registration = new Registration(data);
-    await registration.save();
-    console.log("Registration created successfully");
-    return registration;
-  } catch (error) {
-    console.error("Error creating registration:", error);
-    throw error;
-  }
-}
-
-// Read (Get) a registration by ID
-async function getRegistrationById(registrationId) {
-  try {
-    const registration = await Registration.findById(registrationId)
-      .populate('event_id user_id');
+    const registration = await registrationCollection.findOne({ _id: new ObjectId(id) });
     if (!registration) {
-      throw new Error("Registration not found");
+      throw new Error('Registration not found');
     }
+
     return registration;
-  } catch (error) {
-    console.error("Error fetching registration:", error);
-    throw error;
-  }
-}
+  },
 
-// Update a registration by ID
-async function updateRegistrationById(registrationId, updateData) {
-  try {
-    const updatedRegistration = await Registration.findByIdAndUpdate(
-      registrationId,
-      updateData,
-      { new: true, runValidators: true }
+  findByUserId: async (userId) => {
+    if (!ObjectId.isValid(userId)) {
+      throw new Error('Invalid user ID');
+    }
+
+    const registrations = await registrationCollection.find({ user_id: new ObjectId(userId) }).toArray();
+    if (registrations.length === 0) {
+      throw new Error('No registrations found for the user');
+    }
+
+    return registrations;
+  },
+
+  findByEventId: async (eventId) => {
+    if (!ObjectId.isValid(eventId)) {
+      throw new Error('Invalid event ID');
+    }
+
+    const registrations = await registrationCollection.find({ event_id: new ObjectId(eventId) }).toArray();
+    if (registrations.length === 0) {
+      throw new Error('No registrations found for the event');
+    }
+
+    return registrations;
+  },
+
+  updateById: async (id, updateData) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid registration ID');
+    }
+  
+    const result = await registrationCollection.updateOne(
+      { _id: new ObjectId(id) }, 
+      { $set: updateData } 
     );
-    if (!updatedRegistration) {
-      throw new Error("Registration not found");
+  
+    if (result.matchedCount === 0) {
+      throw new Error('Registration not found'); 
     }
-    console.log("Registration updated successfully");
+  
+    const updatedRegistration = await registrationCollection.findOne({ _id: new ObjectId(id) });
+  
     return updatedRegistration;
-  } catch (error) {
-    console.error("Error updating registration:", error);
-    throw error;
-  }
-}
+  },
 
-// Delete a registration by ID
-async function deleteRegistrationById(registrationId) {
-  try {
-    const deletedRegistration = await Registration.findByIdAndDelete(registrationId);
-    if (!deletedRegistration) {
-      throw new Error("Registration not found");
+  findAll: async () => {
+    try {
+      const registrations = await registrationCollection.find().toArray();
+      return registrations;
+    } catch (error) {
+      console.error('Error fetching registrations:', error.message);
+      throw new Error('Failed to fetch registrations');
     }
-    console.log("Registration deleted successfully");
-    return deletedRegistration;
-  } catch (error) {
-    console.error("Error deleting registration:", error);
-    throw error;
-  }
-}
+  },
 
-// Export the model and CRUD functions
-module.exports = {
-  Registration,
-  createRegistration,
-  getRegistrationById,
-  updateRegistrationById,
-  deleteRegistrationById
+  deleteById: async (id) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid registration ID');
+    }
+
+    const result = await registrationCollection.deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      throw new Error('Registration not found');
+    }
+
+    return true;
+  },
 };
+
+module.exports = registration;
