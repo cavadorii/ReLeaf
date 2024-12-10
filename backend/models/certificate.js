@@ -1,103 +1,73 @@
-// Import mongoose
-const mongoose = require('mongoose');
+const { client } = require('../config/database');
 
-// Define the certificate schema
-const certificateSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+const certificateCollection = client.db('Cluster0').collection('certificates');
+
+const Certificate = {
+  /**
+   * Creates a new certificate in the database.
+   * @param {Object} certificate - The certificate data.
+   * @returns {Object} - The inserted certificate.
+   */
+  create: async (certificate) => {
+    certificate.issued_at = new Date().toISOString();
+    const result = await certificateCollection.insertOne(certificate);
+    return result;
   },
-  event_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Event',
-    required: true
+
+  /**
+   * Finds a certificate by its ID.
+   * @param {string} id - The certificate ID.
+   * @returns {Object|null} - The found certificate or null if not found.
+   */
+  findById: async (id) => {
+    const { ObjectId } = require('mongodb');
+    return await certificateCollection.findOne({ _id: new ObjectId(id) });
   },
-  certificate_url: {
-    type: String,
-    required: true
-  },
-  issued_at: {
-    type: Date,
-    default: Date.now
-  }
-});
 
-// Create a unique index for efficient querying on user_id and event_id
-certificateSchema.index({ user_id: 1, event_id: 1 }, { unique: true });
-
-// Compile the model
-const Certificate = mongoose.model('Certificate', certificateSchema);
-
-// CRUD Operations
-
-// Create a new certificate
-async function createCertificate(data) {
-  try {
-    const certificate = new Certificate(data);
-    await certificate.save();
-    console.log("Certificate created successfully");
-    return certificate;
-  } catch (error) {
-    console.error("Error creating certificate:", error);
-    throw error;
-  }
-}
-
-// Read (Get) a certificate by ID
-async function getCertificateById(certificateId) {
-  try {
-    const certificate = await Certificate.findById(certificateId)
-      .populate('user_id event_id'); // Optional: populate references
-    if (!certificate) {
-      throw new Error("Certificate not found");
-    }
-    return certificate;
-  } catch (error) {
-    console.error("Error fetching certificate:", error);
-    throw error;
-  }
-}
-
-// Update a certificate by ID
-async function updateCertificateById(certificateId, updateData) {
-  try {
-    const updatedCertificate = await Certificate.findByIdAndUpdate(
-      certificateId,
-      updateData,
-      { new: true, runValidators: true }
+  /**
+   * Updates a certificate by its ID.
+   * @param {string} id - The certificate ID.
+   * @param {Object} updates - The fields to update.
+   * @returns {Object|null} - The updated certificate or null if not found.
+   */
+  updateById: async (id, updates) => {
+    const { ObjectId } = require('mongodb');
+    const result = await certificateCollection.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: updates },
+      { returnDocument: 'after' }
     );
-    if (!updatedCertificate) {
-      throw new Error("Certificate not found");
-    }
-    console.log("Certificate updated successfully");
-    return updatedCertificate;
-  } catch (error) {
-    console.error("Error updating certificate:", error);
-    throw error;
-  }
-}
+    return result.value;
+  },
 
-// Delete a certificate by ID
-async function deleteCertificateById(certificateId) {
-  try {
-    const deletedCertificate = await Certificate.findByIdAndDelete(certificateId);
-    if (!deletedCertificate) {
-      throw new Error("Certificate not found");
-    }
-    console.log("Certificate deleted successfully");
-    return deletedCertificate;
-  } catch (error) {
-    console.error("Error deleting certificate:", error);
-    throw error;
-  }
-}
+  /**
+   * Deletes a certificate by its ID.
+   * @param {string} id - The certificate ID.
+   * @returns {Object|null} - The deleted certificate or null if not found.
+   */
+  deleteById: async (id) => {
+    const { ObjectId } = require('mongodb');
+    const result = await certificateCollection.findOneAndDelete({ _id: new ObjectId(id) });
+    return result.value;
+  },
 
-// Export the model and CRUD functions
-module.exports = {
-  Certificate,
-  createCertificate,
-  getCertificateById,
-  updateCertificateById,
-  deleteCertificateById
+  /**
+   * Finds certificates by user ID.
+   * @param {string} userId - The user ID.
+   * @returns {Array} - A list of certificates.
+   */
+  findByUserId: async (userId) => {
+    return await certificateCollection.find({ user_id: userId }).toArray();
+  },
+
+  /**
+   * Finds certificates by event ID.
+   * @param {string} eventId - The event ID.
+   * @returns {Array} - A list of certificates.
+   */
+  findByEventId: async (eventId) => {
+    return await certificateCollection.find({ event_id: eventId }).toArray();
+  },
 };
+
+module.exports = Certificate;
