@@ -30,6 +30,9 @@ const Login: React.FC = () => {
       });
 
       if (response.status === 200) {
+        const { userId, username } = response.data;
+        localStorage.setItem('userId', userId); // Store userId in localStorage
+        localStorage.setItem('username', username);
         router.push('/plantMe');
       }
     } catch (error) {
