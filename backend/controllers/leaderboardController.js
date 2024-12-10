@@ -1,11 +1,3 @@
-/*const {
-    createLeaderboardEntry,
-    getLeaderboardEntryById,
-    updateLeaderboardEntryById,
-    deleteLeaderboardEntryById,
-    Leaderboard
-  }=require('../models/leaderboard')*/
-
 const Leaderboard = require('../models/leaderboard');
 
 const leaderboardController = {
@@ -19,7 +11,7 @@ const leaderboardController = {
       }
 
       const newEntry = { event_id, user_id, points, rank };
-      const createdEntry = await Leaderboard.createLeaderboardEntry(newEntry);
+      const createdEntry = await Leaderboard.create(newEntry);
 
       res.status(201).json({
         message: 'Leaderboard entry created successfully',
@@ -29,13 +21,24 @@ const leaderboardController = {
       res.status(400).json({ error: error.message });
     }
   },
+  getAllEntries:async(req,res)=>{
+    try{
+      const entries=await Leaderboard.findAll();
+      if(!entries){
+        return res.status(404).json({ error: 'Leaderboard entries not found' });
+      }
+      res.status(200).json(entries);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 
   // Get a leaderboard entry by ID
   getEntryById: async (req, res) => {
     const { id } = req.params;
 
     try {
-      const entry = await Leaderboard.getLeaderboardEntryById(id).populate('event_id user_id');
+      const entry = await Leaderboard.findById(id);
       if (!entry) {
         return res.status(404).json({ error: 'Leaderboard entry not found' });
       }
@@ -52,18 +55,15 @@ const leaderboardController = {
     const updates = req.body;
 
     try {
-      const updatedEntry = await Leaderboard.updateLeaderboardEntryById(id, updates, {
-        new: true,
-        runValidators: true,
-      });
+      const updatedEntry = await Leaderboard.updateById(id, updates);
 
-      if (!updatedEntry) {
+      if (!updatedEntry.modifiedCount) {
         return res.status(404).json({ error: 'Leaderboard entry not found' });
       }
 
       res.status(200).json({
         message: 'Leaderboard entry updated successfully',
-        entry: updatedEntry,
+        updatedEntry,
       });
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -75,9 +75,9 @@ const leaderboardController = {
     const { id } = req.params;
 
     try {
-      const deletedEntry = await Leaderboard.deleteLeaderboardEntryById(id);
+      const deletedEntry = await Leaderboard.deleteById(id);
 
-      if (!deletedEntry) {
+      if (!deletedEntry.deletedCount) {
         return res.status(404).json({ error: 'Leaderboard entry not found' });
       }
 
@@ -92,9 +92,7 @@ const leaderboardController = {
     const { eventId } = req.params;
 
     try {
-      const leaderboard = await Leaderboard.find({ event_id: eventId })
-        .populate('user_id', 'username') // Adjust fields as needed
-        .sort({ points: -1, rank: 1 }); // Sort by points descending and rank ascending
+      const leaderboard = await Leaderboard.findByEventId(eventId);
 
       res.status(200).json(leaderboard);
     } catch (error) {

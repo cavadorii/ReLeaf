@@ -7,8 +7,12 @@ const cookieParser = require('cookie-parser');
 const { connectDB } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const predictRoutes = require('./routes/predictRoutes');
+
+const treePhotoRoutes = require('./routes/treePhotoRoutes');
+const usersRoutes = require('./routes/usersRoutes');
 const leaderboardRoutes=require('./routes/leaderboardRoutes')
 const certificateRoutes=require('./routes/certificateRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 const app = express();
 app.use(cors());
@@ -17,10 +21,17 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/predict', predictRoutes);
-app.use('/api/leaderboard',leaderboardRoutes);
 app.use('/api/certificates', certificateRoutes);
+app.use('/api/tree-photos',treePhotoRoutes);
+app.use('/api/users',usersRoutes);
+app.use('/api/leaderboard',leaderboardRoutes)
+app.use('/api/events', eventRoutes);
 
 const PORT = process.env.PORT || 5000;
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ message: 'Server is healthy' });
+});
 
 app.listen(PORT, async () => {
   await connectDB();

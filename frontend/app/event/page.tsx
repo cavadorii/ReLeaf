@@ -1,114 +1,74 @@
-'use client'; // This marks the component as a client-side component
+'use client'; // Mark as a client-side component
+import React, { useEffect, useState } from 'react';
 
-import React from 'react';
+const EventDetails: React.FC = () => {
+  const [event, setEvent] = useState<any | null>(null);
 
-const Event: React.FC = () => {
-    // Page container style
-    const containerStyle: React.CSSProperties = {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'column',
-      backgroundColor: '#f4f7fa',
-      padding: '20px',
-      fontFamily: '"Quicksand", sans-serif',
-      minHeight: '100vh',
-    };
+  useEffect(() => {
+    const currentId = localStorage.getItem('Id');
+    const id = Number(currentId); // Convert ID to a number
 
-  // Events grid style
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: '20px',
-    width: '100%',
-    maxWidth: '1200px',
-  };
+    // Mock events data (this should be replaced with real data fetching in a real app)
+    const events = [
+      {
+        id: 1,
+        title: 'Community Cleanup',
+        description: 'Join us for a community cleanup event to make the neighborhood cleaner!',
+        location: {
+          address: '123 Main St, Springfield',
+          coordinates: { latitude: 40.7128, longitude: -74.0060 },
+        },
+        start_date: '2024-11-15T09:00:00Z',
+        end_date: '2024-11-15T12:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'Food Drive',
+        description: 'Help us collect food donations for local shelters.',
+        location: {
+          address: '456 Elm St, Springfield',
+          coordinates: { latitude: 40.7138, longitude: -74.0059 },
+        },
+        start_date: '2024-11-20T10:00:00Z',
+        end_date: '2024-11-20T14:00:00Z',
+      },
+      {
+        id: 3,
+        title: 'Tree Planting',
+        description: 'Join us to plant trees and help the environment.',
+        location: {
+          address: '789 Oak St, Springfield',
+          coordinates: { latitude: 40.7148, longitude: -74.0048 },
+        },
+        start_date: '2024-11-25T08:00:00Z',
+        end_date: '2024-11-25T11:00:00Z',
+      },
+    ];
 
-  // Individual event box style
-  const eventBoxStyle: React.CSSProperties = {
-    backgroundColor: '#CBD2A4',
-    borderRadius: '10px',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-    textAlign: 'center',
-    transition: 'transform 0.3s ease',
-    cursor: 'pointer',
-  };
+    // Find the event by ID and update state
+    if (id) {
+      const selectedEvent = events.find((event) => event.id === id);
+      setEvent(selectedEvent);
+    }
+  }, []); // Add empty dependency array to run only once
 
-  const eventTitleStyle: React.CSSProperties = {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    color: '#54473F',
-    marginBottom: '10px',
-  };
-
-  const eventDescriptionStyle: React.CSSProperties = {
-    fontSize: '14px',
-    color: '#555',
-    marginBottom: '15px',
-  };
-
-  const eventDateStyle: React.CSSProperties = {
-    fontSize: '12px',
-    color: '#789461',
-  };
-
-  // Upcoming events header box style
-  const headerBoxStyle: React.CSSProperties = {
-    backgroundColor: '#CBD2A4', // Light transparent background
-    padding: '15px 30px',
-    borderRadius: '10px',
-    textAlign: 'center',
-    marginBottom: '30px',
-    fontFamily: '"Quicksand", sans-serif',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#54473F',
-    position: 'relative',
-    zIndex: 1,
-    top: '-50px', // Move the title slightly upwards
-  };
-
-  const handleMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.transform = 'scale(1.05)';
-  };
-
-  const handleMouseOut = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.transform = 'scale(1)';
-  };
-
-  // Placeholder data for events (to be replaced with real data from the database)
-  const events = Array.from({ length: 10 }, (_, index) => ({
-    id: index + 1,
-    title: `Event ${index + 1}`,
-    description: 'This is a brief description of the event.',
-    date: '2024-11-15',
-  }));
+  if (!event) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div style={containerStyle}>
-      {/* Upcoming Events Title */}
-      <div style={headerBoxStyle}>
-        Upcoming Events
-      </div>
-
-      {/* Events Grid */}
-      <div style={gridStyle}>
-        {events.map(event => (
-          <div
-            key={event.id}
-            style={eventBoxStyle}
-            onMouseOver={handleMouseOver}
-            onMouseOut={handleMouseOut}
-          >
-            <h2 style={eventTitleStyle}>{event.title}</h2>
-            <p style={eventDescriptionStyle}>{event.description}</p>
-            <p style={eventDateStyle}>Date: {event.date}</p>
-          </div>
-        ))}
-      </div>
+    <div style={{ padding: '20px', fontFamily: '"Quicksand", sans-serif', textAlign: 'center' }}>
+      <h1 style={{ fontSize: '24px', color: '#54473F' }}>{event.title}</h1>
+      <p style={{ fontSize: '16px', color: '#555' }}>{event.description}</p>
+      <p style={{ fontSize: '14px', color: '#789461' }}>
+        Location: {event.location.address}
+      </p>
+      <p style={{ fontSize: '14px', color: '#789461' }}>
+        Date: {new Date(event.start_date).toLocaleDateString()} -{' '}
+        {new Date(event.end_date).toLocaleDateString()}
+      </p>
     </div>
   );
 };
 
-export default Event;
+export default EventDetails;
