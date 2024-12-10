@@ -15,28 +15,53 @@ const PlantMePage: React.FC = () => {
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
-      backgroundColor: '#d1d1b9',
+      background: 'linear-gradient(to bottom, #789461, #CBD2A4)',
       height: '100vh',
-      padding: '10px',
+      padding: '20px',
       boxSizing: 'border-box' as const,
+      color: '#ffffff',
+      fontFamily: '"Quicksand", sans-serif',
+    },
+    titleContainer: {
+      textAlign: 'center' as const,
+      marginBottom: '20px',
     },
     title: {
-      fontSize: '24px',
+      fontSize: '2rem',
       fontWeight: 'bold',
-      color: '#4a5b3e',
+      color: '#ffffff',
       marginBottom: '10px',
     },
+    subtitle: {
+      fontSize: '1.2rem',
+      color: '#E4E8E1',
+      marginBottom: '30px',
+    },
     contributeButton: {
-      width: '90%',
-      padding: '10px',
-      fontSize: '18px',
-      color: 'white',
-      backgroundColor: '#74c67a',
-      border: 'none',
-      borderRadius: '10px',
-      cursor: 'pointer',
+      padding: '14px 20px',
+            fontSize: '18px',
+            color: 'white',
+            backgroundColor: '#789461',
+            border: 'none',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            fontFamily: '"Quicksand", sans-serif',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+            transition: 'background-color 0.3s, transform 0.3s',
+            marginTop: '20px',
+    },
+    mapContainer: {
+      width: '100%',
+      maxWidth: '800px',
+      height: '60%',
+      borderRadius: '20px',
+      overflow: 'hidden',
+      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
       marginBottom: '20px',
-      marginTop: 'auto',
+    },
+    buttonHover: {
+      backgroundColor: '#45A049',
+      transform: 'scale(1.05)',
     },
   };
 
@@ -44,23 +69,15 @@ const PlantMePage: React.FC = () => {
     <div style={styles.page}>
       <h2 style={styles.title}>Plant Me</h2>
 
+      <div>
+      <p style={styles.subtitle}>Discover locations and contribute to the environment by planting trees!</p>
+      </div>
       {/* Map Component */}
       <MapComponent />
 
       <Link href="/uploadTreePhoto">
         <button
-          style={{
-            width: '100%',
-            padding: '14px',
-            fontSize: '18px',
-            color: 'white',
-            backgroundColor: '#54473F',
-            border: 'none',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            fontFamily: '"Quicksand", sans-serif',
-            marginBottom: '20px',
-          }}
+          style={styles.contributeButton}
         >
           Contribute
         </button>
