@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CSSProperties } from 'react';
+import './styles/globals.css';
 
 const Home: React.FC = () => {
   return (
@@ -48,6 +49,10 @@ const styles: { [key: string]: CSSProperties } = {
     color: '#7f8c8d',
   },
   nav: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: '10px',
     marginBottom: '20px',
   },
   link: {

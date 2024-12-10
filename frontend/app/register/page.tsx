@@ -14,7 +14,6 @@ const Register: React.FC = () => {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-   // const [password, setPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
@@ -24,10 +23,6 @@ const Register: React.FC = () => {
       [e.target.name]: e.target.value,
     });
   };
-
-//  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //  setPassword(e.target.value);
-  //};
 
 
 
