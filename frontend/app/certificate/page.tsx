@@ -5,12 +5,22 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { format } from 'date-fns';
+
 
 interface Certificate {
   _id: string;
-  user_id: { name: string }; // Adjust based on your User model
-  event_id: { title: string }; // Adjust based on your Event model
+  user_id: { name: string };
+  event_id: { title: string };
   issued_at: string;
+}
+
+interface EventDetails{
+  _id: string;
+  title: string;
+  location: {address: string};
+  start_date: Date;
+  end_date: Date;
 }
 
 const CertificatePage: React.FC = () => {
@@ -22,6 +32,7 @@ const CertificatePage: React.FC = () => {
   const [downloadLoading, setDownloadLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [username, setUserName] = useState<string|null>(null);
+  const [eventDetails, setEventDetails] = useState<EventDetails|null>(null);
 
   useEffect(() => {
     if (!certificateId) {
@@ -35,9 +46,10 @@ const CertificatePage: React.FC = () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/certificates/${certificateId}`);
         setCertificate(response.data);
-        console.log(response.data);
-        const username = await axios.get(`http://localhost:5000/api/auth/user?userId=${response.data.user_id}`);
-        setUserName(username.data);
+        const user = await axios.get(`http://localhost:5000/api/users/${response.data.user_id}`);
+        setUserName(user.data.username);
+        const event = await axios.get(`http://localhost:5000/api/events/${response.data.event_id}`);
+        setEventDetails(event.data);
       } catch (err: any) {
         console.error('Error fetching certificate:', err);
         setError(err.response?.data?.message || 'Failed to load certificate.');
@@ -55,7 +67,7 @@ const CertificatePage: React.FC = () => {
 
     setDownloadLoading(true);
     try {
-      const response = await axios.get(`/api/certificates/${certificateId}/download`, {
+      const response = await axios.get(`http://localhost:5000/api/certificates/${certificateId}/download`, {
         responseType: 'blob', // Ensure the response is treated as a file
       });
 
@@ -92,7 +104,7 @@ const CertificatePage: React.FC = () => {
     );
   }
 
-  if (!certificate) {
+  if (!certificate || !eventDetails) {
     return (
       <div style={styles.container}>
         <p>Certificate not found.</p>
@@ -105,8 +117,11 @@ const CertificatePage: React.FC = () => {
       <div style={styles.card}>
         <h1 style={styles.title}>Certificate of Participation</h1>
         <p style={styles.text}>
-          This certifies that <strong>{username}</strong> participated in the event{' '}
-          <strong>{certificate.event_id.title}</strong>.
+          This certifies that <strong>{username}</strong> participated in the event 
+          <strong> {eventDetails.title}</strong> between{' '}
+            {format(new Date(eventDetails.start_date), 'PPpp')} and{' '}
+            {format(new Date(eventDetails.end_date), 'PPpp')}.<br></br>
+          Location: {eventDetails.location.address}.
         </p>
         <p style={styles.text}>Issued on: {new Date(certificate.issued_at).toLocaleDateString()}</p>
 
