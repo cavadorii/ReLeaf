@@ -1,95 +1,89 @@
 'use client'; // Mark as a client-side component
 import React, { useEffect, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const EventDetails: React.FC = () => {
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isVolunteer, setIsVolunteer] = useState<boolean>(false);
-  const [isJoined, setIsJoined] = useState<boolean>(false); // Track if the user has joined the event
-  const [popupMessage, setPopupMessage] = useState<string | null>(null); // For popup message
+  const [isJoined, setIsJoined] = useState<boolean>(false);
+  const [popupMessage, setPopupMessage] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const eventId = searchParams.get('id');
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserAndEvent = async () => {
-      const userId = localStorage.getItem('userId'); // Get the user ID from local storage
-      const eventId = localStorage.getItem('Id'); // Get the event ID from local storage
-  
+      const userId = localStorage.getItem('userId');
+
       if (!userId || !eventId) {
         setError('User or Event ID not found.');
         setLoading(false);
         return;
       }
-  
+
       try {
         setLoading(true);
-        // Fetch user details from the backend
         const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`);
         if (!userResponse.ok) {
           throw new Error('User not found');
         }
         const userData = await userResponse.json();
-        console.log('User Data:', userData);  // Add log here
         if (userData.role === 'volunteer') {
-          setIsVolunteer(true); // If user is a volunteer, show the button
+          setIsVolunteer(true);
         }
-  
-        // Fetch event details from the backend
+
         const eventResponse = await fetch(`http://localhost:5000/api/events/${eventId}`);
         if (!eventResponse.ok) {
           throw new Error('Error fetching event details');
         }
         const eventData = await eventResponse.json();
         setEvent(eventData);
-        console.log('Event Data:', eventData);  // Add log here
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchUserAndEvent();
   }, []);
 
   const handleJoinEvent = async () => {
     if (!event) return;
-  
+
     try {
-      // Get userId from localStorage
       const userId = localStorage.getItem('userId');
       if (!userId) {
         throw new Error('User ID not found');
       }
-  
-      // Check if user is already in the volunteer list
+
       if (event.volunteers.some((volunteer: any) => volunteer.user_id === userId)) {
         setPopupMessage('You have already joined this event!');
         return;
       }
-  
-      // Add the user with status "pending"
+
       const newVolunteer = {
         user_id: userId,
-        status: 'pending', // Default status
+        status: 'pending',
       };
-  
-      // Update the event's volunteers list with the new volunteer
+
       const updatedEvent = {
         ...event,
-        volunteers: [...event.volunteers, newVolunteer], // Add new volunteer to the list
+        volunteers: [...event.volunteers, newVolunteer],
       };
-  
-      // Send the updated event data to the backend
+
       const updateResponse = await fetch(`http://localhost:5000/api/events/${event._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedEvent), // Send the updated event with the new volunteers list
+        body: JSON.stringify(updatedEvent),
       });
-  
+
       if (updateResponse.ok) {
-        setIsJoined(true); // Update UI to show user has joined
+        setIsJoined(true);
         setPopupMessage('You have successfully joined the event!');
       } else {
         throw new Error('Failed to update event details');
@@ -97,6 +91,10 @@ const EventDetails: React.FC = () => {
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   if (loading) {
@@ -112,23 +110,25 @@ const EventDetails: React.FC = () => {
   }
 
   const containerStyle: React.CSSProperties = {
-    backgroundColor: '#FFFFFF', // Overall background
+    backgroundColor: '#FFFFFF',
     minHeight: '100vh',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     padding: '20px',
     fontFamily: '"Quicksand", sans-serif',
+    paddingTop: '60px', 
   };
 
   const boxStyle: React.CSSProperties = {
-    backgroundColor: '#CBD2A4', // Box background color
+    backgroundColor: '#CBD2A4',
     borderRadius: '10px',
     padding: '20px',
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
     textAlign: 'center',
     maxWidth: '600px',
     width: '100%',
+    position: 'relative',
   };
 
   const titleStyle: React.CSSProperties = {
@@ -136,6 +136,7 @@ const EventDetails: React.FC = () => {
     fontWeight: 'bold',
     color: '#54473F',
     marginBottom: '20px',
+    marginTop: '50px',
   };
 
   const detailStyle: React.CSSProperties = {
@@ -144,9 +145,43 @@ const EventDetails: React.FC = () => {
     marginBottom: '10px',
   };
 
+  const joinButtonStyle: React.CSSProperties = {
+    padding: '10px 20px',
+    fontSize: '16px',
+    color: '#FFFFFF',
+    backgroundColor: '#54473F',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '20px',
+    alignSelf: 'center',
+  };
+
+  
+const backButtonStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '10px',
+  left: '10px',
+  padding: '5px 10px',
+  fontSize: '16px',
+  color: '#FFFFFF',
+  backgroundColor: '#54473F',
+  border: 'none',
+  borderRadius: '5px',
+  cursor: 'pointer',
+  zIndex: 10, 
+};
+
+  const popupStyle: React.CSSProperties = {
+    marginTop: '10px',
+    color: '#4CAF50',
+    fontWeight: 'bold',
+  };
+
   return (
     <div style={containerStyle}>
       <div style={boxStyle}>
+        <button style={backButtonStyle} onClick={handleBack}>Back</button>
         <h1 style={titleStyle}>{event.title}</h1>
         <p style={detailStyle}>{event.description}</p>
         <p style={detailStyle}>Location: {event.location?.address || 'No location available'}</p>
@@ -155,13 +190,11 @@ const EventDetails: React.FC = () => {
           {new Date(event.end_date).toLocaleDateString()}
         </p>
 
-        {/* Show the "Join Event" button only if the user is a volunteer */}
-        {isVolunteer && !isJoined && (
-          <button onClick={handleJoinEvent}>Join Event</button>
-        )}
+        (
+          <button style={joinButtonStyle} onClick={handleJoinEvent}>Join Event</button>
+        )
 
-        {/* Popup message after joining */}
-        {popupMessage && <div>{popupMessage}</div>}
+        {popupMessage && <div style={popupStyle}>{popupMessage}</div>}
       </div>
     </div>
   );
