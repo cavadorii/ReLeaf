@@ -31,15 +31,19 @@ const feedbackController = {
     },
 
     getAverageEventRating: async(req, res) => {
-        try{
-            const event_id = req.event_id;
+        try {
+            const event_id = req.body.event_id;
             const feedbacks = await EventFeedback.findAll();
             let sum = 0;
+            let numberOfRatings = 0;
             feedbacks.forEach(feedback => {
-                sum = sum + feedback.rating;
+                if (feedback.event_id === event_id) {
+                    sum = sum + feedback.rating;
+                    numberOfRatings++;  
+                }
             });
-            const average = sum / feedbacks.length;
-            return res.status(200).json(average);
+            const average = sum / numberOfRatings;
+            return res.status(200).json({averageRating: average, sum: sum, numberOfRatings: numberOfRatings, id: event_id});
         } catch (error) {
             return res.status(400).json({error: error.toString()});
         }
