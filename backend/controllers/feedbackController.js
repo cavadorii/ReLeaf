@@ -8,7 +8,7 @@ const feedbackController = {
             const result = await EventFeedback.create(newFeedback);
             res.status(201).json({message: "Feedback added successfully"});
         } catch (error) {
-            res.status(400).json({error : error.toString()});
+            res.status(400).json({error: error.toString()});
         }
     },
 
@@ -22,8 +22,27 @@ const feedbackController = {
     },
 
     getAllEventFeedbacks: async (req, res) => {
-        const feedbacks = await EventFeedback.findAll();
-        return res.status(200).json(feedbacks);
+        try{
+            const feedbacks = await EventFeedback.findAll();
+            return res.status(200).json(feedbacks);
+        } catch (error) {
+            return res.status(400).json({error: error.toString()});
+        }
+    },
+
+    getAverageEventRating: async(req, res) => {
+        try{
+            const event_id = req.event_id;
+            const feedbacks = await EventFeedback.findAll();
+            let sum = 0;
+            feedbacks.forEach(feedback => {
+                sum = sum + feedback.rating;
+            });
+            const average = sum / feedbacks.length;
+            return res.status(200).json(average);
+        } catch (error) {
+            return res.status(400).json({error: error.toString()});
+        }
     }
 };
 
