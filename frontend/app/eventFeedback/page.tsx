@@ -32,9 +32,9 @@ const EventFeedback: React.FC = () => {
 
         try {
             const response = await axios.post('http://localhost:5000/api/feedback', {
-                event_id: formData.event_id,
-                volunteer_id: formData.volunteer_id,
-                rating: formData.rating,
+                event_id: Number(formData.event_id),
+                volunteer_id: Number(formData.volunteer_id),
+                rating: Number(formData.rating),
                 comment: formData.comment
             });
 
