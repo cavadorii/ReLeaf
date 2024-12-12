@@ -32,7 +32,7 @@ const feedbackController = {
 
     getAverageEventRating: async(req, res) => {
         try {
-            const event_id = req.body.event_id;
+            const event_id = req.params.event_id;
             const feedbacks = await EventFeedback.findAll();
             let sum = 0;
             let numberOfRatings = 0;
