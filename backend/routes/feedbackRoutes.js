@@ -3,7 +3,7 @@ const feedbackController = require('../controllers/feedbackController');
 
 const router = express.Router();
 
-router.post('/feedback', feedbackController.writeFeedback);
-router.get('/feedback/${eventId}', feedbackController.getEventFeedbackById(eventId));
+router.post('/feedback', feedbackController.writeEventFeedback);
+router.get(`/feedback`, feedbackController.getAllEventFeedbacks);
 
 module.exports = router;

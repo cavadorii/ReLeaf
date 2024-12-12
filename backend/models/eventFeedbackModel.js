@@ -10,7 +10,11 @@ const EventFeedback = {
     },
 
     findById: async(id) => {
-        return await eventFeedbackCollection.findOne({id});
+        return await eventFeedbackCollection.findOne({_id: id});
+    },
+
+    findAll: async() => {
+        return await eventFeedbackCollection.find({}).toArray();
     }
 };
 
