@@ -13,7 +13,7 @@ const feedbackController = {
     },
 
     getEventFeedbackById: async (req, res) => {
-        const id = req.id;
+        const id = req.body.id;
         const feedback = await EventFeedback.findById(id);
         
         if (!feedback) return res.status(404).json({message:'"Event feedback not found'})
