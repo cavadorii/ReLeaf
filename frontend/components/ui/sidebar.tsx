@@ -86,23 +86,20 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   return (
-    <>
-      <motion.div
-        className={cn(
-          // Dark background for sidebar, based on your theme.
-          "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar-background text-sidebar-foreground w-[300px] flex-shrink-0 transition-colors duration-300",
-          className
-        )}
-        animate={{
-          width: animate ? (open ? "300px" : "60px") : "300px",
-        }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    </>
+    <motion.div
+      className={cn(
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar-background text-sidebar-foreground w-[300px] flex-shrink-0 transition-all duration-300",
+        className
+      )}
+      animate={{
+        width: animate ? (open ? "300px" : "60px") : "300px",
+      }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      {...props}
+    >
+      {children}
+    </motion.div>
   );
 };
 
@@ -111,52 +108,33 @@ export const MobileSidebar = ({
   children,
   ...props
 }: React.ComponentProps<"div">) => {
-  const { open, setOpen } = useSidebar();
   return (
     <>
+      {/* White strip container */}
       <div
         className={cn(
-          // Adjusted mobile sidebar to fit the theme.
-          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-sidebar-background text-sidebar-foreground w-full"
+          "h-10 px-7 flex items-center justify-between bg-sidebar-background text-sidebar-foreground md:hidden",
+          className
         )}
         {...props}
       >
-        <div className="flex justify-end z-20 w-full">
-          <IconMenu2
-            className="text-sidebar-foreground"
-            onClick={() => setOpen(!open)}
-          />
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className={cn(
-                // Adjusted mobile sidebar overlay to match dark mode.
-                "fixed h-full w-full inset-0 bg-sidebar-background text-sidebar-foreground p-10 z-[100] flex flex-col justify-between",
-                className
-              )}
-            >
-              <div
-                className="absolute right-10 top-10 z-50 text-sidebar-foreground"
-                onClick={() => setOpen(!open)}
-              >
-                <IconX />
-              </div>
-              {children}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* White strip text or branding */}
+        <span className="text-lg font-semibold text-sidebar-foreground">
+          
+        </span>
+      </div>
+
+      {/* Always visible icons in a vertical strip */}
+      <div
+        className="fixed top-0 left-0 h-full bg-sidebar-background text-sidebar-foreground flex flex-col items-center p-4 space-y-4 z-[50] md:hidden"
+        {...props}
+      >
+        {children}
       </div>
     </>
   );
 };
+
 
 export const SidebarLink = ({
   link,
@@ -177,15 +155,26 @@ export const SidebarLink = ({
       )}
       {...props}
     >
-      {/* Icon is already styled correctly. */}
-      {link.icon}
+      {/* Icon is always visible */}
+      <motion.div
+        animate={{
+          scale: 1, // Keep icons at a consistent size
+          opacity: 1, // Icons are always visible
+        }}
+        className="text-sidebar-foreground flex-shrink-0"
+      >
+        {link.icon}
+      </motion.div>
 
+      {/* Text is hidden when the sidebar is closed */}
       <motion.span
         animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
+          opacity: animate && open ? 1 : 0,
         }}
-        className="text-sidebar-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className={cn(
+          "text-sidebar-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0",
+          "hidden md:inline-block" // Text remains hidden on small screens
+        )}
       >
         {link.label}
       </motion.span>
