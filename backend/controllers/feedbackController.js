@@ -43,7 +43,7 @@ const feedbackController = {
                 }
             });
             const average = sum / numberOfRatings;
-            return res.status(200).json({averageRating: average, sum: sum, numberOfRatings: numberOfRatings, id: event_id});
+            return res.status(200).json({averageRating: average});
         } catch (error) {
             return res.status(400).json({error: error.toString()});
         }
