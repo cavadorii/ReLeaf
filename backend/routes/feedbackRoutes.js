@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/feedback', feedbackController.writeEventFeedback);
 router.get('/feedback/:id', feedbackController.getEventFeedbackById);
-router.get(`/feedbacks`, feedbackController.getAllEventFeedbacks);
-router.get('/averageRating', feedbackController.getAverageEventRating);
+router.get('/feedbacks', feedbackController.getAllEventFeedbacks);
+router.get('/averageRating/:event_id', feedbackController.getAverageEventRating);
 
 module.exports = router;
