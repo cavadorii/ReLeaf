@@ -6,7 +6,6 @@ const Leaderboard = {
   // Create a new leaderboard entry
   create: async (entry) => {
     entry.points = entry.points || 0; // Default to 0 if not provided
-    entry.rank = entry.rank || 1; // Ensure rank is provided
     entry.created_at = new Date().toISOString(); // Add a timestamp
     const result = await leaderboardCollection.insertOne(entry);
     return result;
@@ -41,7 +40,7 @@ const Leaderboard = {
     const ObjectId = require('mongodb').ObjectId;
     return await leaderboardCollection
       .find({ event_id: new ObjectId(eventId) })
-      .sort({ points: -1, rank: 1 }) // Sort by points descending, rank ascending
+      .sort({ points: -1}) // Sort by points descending
       .toArray();
   },
 
