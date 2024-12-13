@@ -143,7 +143,7 @@ const Rating: React.FC<RatingProps> = ({
             );
         }
 
-        return <div className='horizontalContainer'>{stars}</div>;
+        return <div style={horizontalContainer} className={`rating ${className}`}>{stars}</div>;
     };
 
 export default Rating;
