@@ -53,4 +53,14 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get tree photos by user ID
+router.get('/user/:user_id', async (req, res) => {
+  try {
+    await TreePhotoSchemaController.getTreePhotosByUserId(req, res); // Pass req and res
+  } catch (error) {
+    console.error('Error fetching tree photos by user ID:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

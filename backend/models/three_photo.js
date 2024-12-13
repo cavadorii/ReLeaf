@@ -6,13 +6,23 @@ const treePhotoCollection = client.db('Cluster0').collection('treePhotos');
 const TreePhoto = {
   // Create a new tree photo
   create: async (data) => {
-    const registrationId = ObjectId.isValid(data.registration_id) ? new ObjectId(data.registration_id) : null;
+    // const registrationId = ObjectId.isValid(data.registration_id) ? new ObjectId(data.registration_id) : null;
+    // const userId = ObjectId.isValid(data.user_id) ? new ObjectId(data.user_id) : null;
+    // const eventId = ObjectId.isValid(data.event_id) ? new ObjectId(data.event_id) : null;
+
+    // if (!registrationId || !userId || !eventId) {
+    //   throw new Error('Invalid registration_id, user_id, or event_id');
+    // }
+
+    const registrationId = data.registration_id; // Skip ObjectId validation for testing
     const userId = ObjectId.isValid(data.user_id) ? new ObjectId(data.user_id) : null;
-    const eventId = ObjectId.isValid(data.event_id) ? new ObjectId(data.event_id) : null;
+    const eventId = data.event_id; // Skip ObjectId validation for testing
 
     if (!registrationId || !userId || !eventId) {
       throw new Error('Invalid registration_id, user_id, or event_id');
     }
+
+
 
     const treePhotoData = {
       ...data,
