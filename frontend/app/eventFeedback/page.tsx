@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,10 @@ const EventFeedback: React.FC = () => {
         rating: 0,
         comment: '',
     });
+
+    useEffect(() => {
+        document.title = "Provide Feedback"
+     }, []);
 
     const router = useRouter();
 
