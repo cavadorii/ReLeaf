@@ -1,13 +1,24 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Rating from './Rating';
 
 
 const EventFeedback: React.FC = () => {
+    const searchParams = useSearchParams();
+    const event_id = searchParams.get('event_id');
+    
+    if (!event_id) {
+        return (
+            <div style={styles.container}>
+              <p style={styles.error}>{"No event ID provided"}</p>
+            </div>
+          );
+    }
+
+
     const [formData, setFormData] = useState({
-        event_id: 0,
         volunteer_id: 0,
         rating: 0,
         comment: '',
@@ -17,7 +28,7 @@ const EventFeedback: React.FC = () => {
 
     useEffect(() => {
         document.title = "Provide Feedback"
-     }, []);
+    }, []);
 
     const router = useRouter();
 
@@ -40,7 +51,7 @@ const EventFeedback: React.FC = () => {
 
         try {
             const response = await axios.post('http://localhost:5000/api/feedback', {
-                event_id: Number(formData.event_id),
+                event_id: Number(event_id),
                 volunteer_id: Number(formData.volunteer_id),
                 rating: Number(formData.rating),
                 comment: formData.comment
@@ -86,26 +97,6 @@ const EventFeedback: React.FC = () => {
                 <h2 style={{ color: '#333', fontSize: '24px', marginBottom: '20px', fontWeight: 'bold' }}>Provide Feedback</h2>
             
                 <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '10px', textAlign: 'left', color: '#789461' }}>
-                        <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Event ID</label>
-                        <input
-                            type='number'
-                            name='event_id'
-                            placeholder='Event ID'
-                            onChange={handleChange}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                border: '1px solid #ddd',
-                                backgroundColor: '#fff',
-                                fontSize: '16px',
-                                color: '#333',
-                                fontFamily: '"Quicksand", sans-serif',
-                            }}
-                        />
-                    </div>
-
                     <div style={{ marginBottom: '10px', textAlign: 'left', color: '#789461' }}>
                         <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Volunteer ID</label>
                         <input
@@ -193,6 +184,23 @@ const EventFeedback: React.FC = () => {
             </div>
         </div>
     );
+};
+
+const styles: { [key: string]: React.CSSProperties } = {
+    container: {
+        padding: '20px',
+        fontFamily: '"Quicksand", sans-serif',
+        textAlign: 'center',
+        backgroundColor: '#F5F5F5',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    error: {
+        color: 'red',
+        fontSize: '18px',
+    },
 };
 
 export default EventFeedback;
