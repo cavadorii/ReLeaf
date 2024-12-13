@@ -67,7 +67,7 @@ const EventFeedback: React.FC = () => {
             });
 
             if (response.status === 201) {
-                router.push('/event');
+                router.push('/plantMe');
             }
         } catch (error) {
             console.error("Could not add the event: ", error);
