@@ -6,31 +6,40 @@ import Rating from './Rating';
 
 
 const EventFeedback: React.FC = () => {
-    const searchParams = useSearchParams();
-    const event_id = searchParams.get('event_id');
-    
-    if (!event_id) {
-        return (
-            <div style={styles.container}>
-              <p style={styles.error}>{"No event ID provided"}</p>
-            </div>
-          );
-    }
-
-
     const [formData, setFormData] = useState({
-        volunteer_id: 0,
         rating: 0,
         comment: '',
     });
+    const [error, setError] = useState<string | null>(null);
+    const [volunteerID, setVolunteerID] = useState<string | null>(null);
+
+    const router = useRouter();
+
+    const searchParams = useSearchParams();
+    const event_id = searchParams.get('event_id');
+    if (!event_id) {
+        setError("No event ID provided");
+    }
 
     const [rating, setRating] = React.useState(0);
 
     useEffect(() => {
         document.title = "Provide Feedback"
+        const volunteer_id = localStorage.getItem('userId');
+        if (!volunteer_id) {
+            setError("You are not logged in");
+        } else {
+            setVolunteerID(volunteer_id);
+        }
     }, []);
 
-    const router = useRouter();
+    if (error || !volunteerID) {
+        return (
+            <div style={styles.container}>
+              <p style={styles.error}>{error}</p>
+            </div>
+          );
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -51,8 +60,8 @@ const EventFeedback: React.FC = () => {
 
         try {
             const response = await axios.post('http://localhost:5000/api/feedback', {
-                event_id: Number(event_id),
-                volunteer_id: Number(formData.volunteer_id),
+                event_id: event_id,
+                volunteer_id: volunteerID,
                 rating: Number(formData.rating),
                 comment: formData.comment
             });
@@ -97,44 +106,9 @@ const EventFeedback: React.FC = () => {
                 <h2 style={{ color: '#333', fontSize: '24px', marginBottom: '20px', fontWeight: 'bold' }}>Provide Feedback</h2>
             
                 <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '10px', textAlign: 'left', color: '#789461' }}>
-                        <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Volunteer ID</label>
-                        <input
-                            type='number'
-                            name='volunteer_id'
-                            placeholder='Volunteer ID'
-                            onChange={handleChange}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                border: '1px solid #ddd',
-                                backgroundColor: '#fff',
-                                fontSize: '16px',
-                                color: '#333',
-                                fontFamily: '"Quicksand", sans-serif',
-                            }}
-                        />
-                    </div>
-
+                    
                     <div style={{ marginBottom: '10px', textAlign: 'left', color: '#789461' }}>
                         <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Rating</label>
-                        {/* <input
-                            type='number'
-                            name='rating'
-                            placeholder='Rating (1 to 5)'
-                            onChange={handleChange}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                border: '1px solid #ddd',
-                                backgroundColor: '#fff',
-                                fontSize: '16px',
-                                color: '#333',
-                                fontFamily: '"Quicksand", sans-serif',
-                            }}
-                        /> */}
                         <Rating
                             count={5}
                             value={rating}
