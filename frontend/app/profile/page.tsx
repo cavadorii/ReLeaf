@@ -1,193 +1,149 @@
-"use client";
-import React, { useState } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link'; // Import Link from Next.js
+import UserInfo from '../components/UserInfo';
+import '../styles/globals.css';
+import axios from 'axios';
+
+// Interface for user data
+interface UserData {
+  _id: string;
+  username: string;
+  profilePic: string;
+  location: string;
+  points: number;
+  nrTrees: number;
+}
+
+interface Certificate {
+  _id: string;
+  user_id: string;
+  event_id: string;
+  issued_at: Date;
+  eventName: string;
+}
+
+interface Event {
+  _id: string;
+  title: string;
+  startDate: Date;
+}
 
 const Profile: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: 'John Doe',
-    address: '123 Green St, Nature City',
-    email: 'johndoe@mail.com',
-    role: 'user',
-    password: 'parola',
-  });
+  const [user, setUser] = useState<UserData | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [leaderboard, setLeaderboard] = useState<UserData[]>([]); // Changed to UserData array for correct typing
 
-  const [editMode, setEditMode] = useState({
-    name: false,
-    address: false,
-    user: false,
-    phone: false,
-    password: false,
-  });
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          console.error('User ID not found in localStorage');
+          return;
+        }
+        const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
+        const userData = await response.data;
+        userData.profilePic = '/user-icon.svg'; // Set a default profile picture
+        setUser(userData);
+        console.log(userData); // Logs user data when fetched
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchUserData();
+  }, []); // Runs only once when the component mounts
+  
+  useEffect(() => {
+    if (user) {
+      const fetchData = async () => {
+        try {
+          // Fetch certificates for the user
+          const certResponse = await axios.get(`http://localhost:5000/api/certificates/user/${user?._id}`);
+          const certData = certResponse.data;
+          setCertificates(certData);
+          
+          // Fetch events
+          const eventsResponse = await axios.get('http://localhost:5000/api/events');
+          const eventsData = eventsResponse.data;
+          setEvents(eventsData);
+          
+          // Fetch all users for the leaderboard
+          const usersResponse = await axios.get('http://localhost:5000/api/users');
+          const usersData = usersResponse.data;
 
-  const [showPassword, setShowPassword] = useState(false);
+          // Sort users by points in descending order
+          const sortedUsers = usersData.sort((a: UserData, b: UserData) => b.points - a.points);
+          setLeaderboard(sortedUsers); // Set sorted users into leaderboard state
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
+    }
+  }, [user]); // This useEffect runs when 'user' is updated
 
-  const handleEditToggle = (field: keyof typeof editMode) => {
-    setEditMode((prevState) => ({
-      ...prevState,
-      [field]: !prevState[field],
-    }));
-  };
+  // If user data is not available yet, show a loading state
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f7f7f7',
-        padding: '20px',
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: '#ffffff',
-          padding: '40px',
-          borderRadius: '15px',
-          boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
-          width: '100%',
-          maxWidth: '900px',
-          boxSizing: 'border-box',
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: '#c3c69a',
-            padding: '25px',
-            borderRadius: '10px',
-            boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <h2 style={{ color: '#000', textAlign: 'center', marginBottom: '25px', fontSize: 30 }}>
-            Profile
-          </h2>
-
-          {/* Profile Fields */}
-          {['name', 'address', 'email', 'role', 'password'].map((field, index) => (
-            <div key={index} style={{ marginBottom: '30px' }}>
-              <label style={{ color: '#333', display: 'block', fontSize: '18px' }}>
-                {field.charAt(0).toUpperCase() + field.slice(1)}
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                <input
-                  type={field === 'password' && !showPassword ? 'password' : 'text'}
-                  name={field}
-                  disabled={field === 'role' || field === 'user' || !editMode[field as keyof typeof editMode]}
-                  value={formData[field as keyof typeof formData]}
-                  onChange={handleChange}
-                  style={{
-                    width: '100%',
-                    padding: '15px',
-                    marginTop: '8px',
-                    borderRadius: '8px',
-                    border: '1px solid #ccc',
-                    backgroundColor: editMode[field as keyof typeof editMode] ? '#f0e6c9' : '#e0e0e0',
-                    color: '#333',
-                    fontSize: '16px',
-                  }}
-                  aria-label={field.charAt(0).toUpperCase() + field.slice(1)}
-                />
-                {/* Button container for alignment */}
-                <div style={{ display: 'flex', alignItems: 'center', position: 'absolute', right: '10px' }}>
-                  {/* Show/Hide Password Toggle */}
-                  {field === 'password' && (
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#526E48',
-                        fontSize: '22px',
-                        marginRight: '5px',  // Adds spacing between the buttons
-                      }}
-                      aria-label={showPassword ? '🙈' : '👁️'}
-                    >
-                      {showPassword ? '🙈' : '👁️'}
-                    </button>
-                  )}
-                  {/* Edit button */}
-                  {field !== 'role' && field !== 'user' && (
-                    <button
-                      type="button"
-                      onClick={() => handleEditToggle(field as keyof typeof editMode)}
-                      style={{
-                        width: '45px',
-                        height: '45px',
-                        backgroundColor: '#f0e6c9',
-                        border: 'none',
-                        marginTop: '8px',
-                        borderRadius: '0 8px 8px 0',
-                        cursor: 'pointer',
-                        fontSize: '22px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                      aria-label={`Edit ${field}`}
-                    >
-                      ✏️
-                    </button>
-                  )}
-                </div>
+    <div className="profile-page">
+      <UserInfo 
+        username={user.username} 
+        profilePic={user.profilePic} 
+        location={user.location}
+        points={user.points}
+        nrTrees={user.nrTrees}
+      />
+      
+      {/* Section container for events, certificates, and leaderboard */}
+      <div className="sections-container">
+        
+        {/* Upcoming Events */}
+        <div className="events-section">
+          <h2>Upcoming Events</h2>
+          {events.map((event, index) => (
+            <div key={index} className="event-card">
+              <div className="event-info">
+                <h3>{event.title}</h3>
               </div>
             </div>
           ))}
+        </div>
 
-          {/* Statistics Section */}
-          <div
-            style={{
-              backgroundColor: '#c3c69a',
-              padding: '30px',
-              marginTop: '30px',
-              borderRadius: '10px',
-              textAlign: 'center',
-              color: '#333',
-              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <div style={{ fontSize: '40px', fontWeight: 'bold', color: '#4CAF50' }}>
-              <span role="img" aria-label="tree">
-                🌳
-              </span>{' '}
-              12
+        {/* Certificates */}
+        <div className="certificates-section">
+          <h2>Certificates</h2>
+          {certificates.map((certificate) => (
+            <div key={certificate._id} className="certificate-card">
+              <p>Certificate id: {certificate._id}</p>
+              <p>Issued At: {certificate.issued_at.toString()}</p>
+              {/* Use Link to navigate to the certificate details page */}
+              <Link href={`/certificate?id=${certificate._id}`} passHref>
+                <button className="view-details-button">View/Download</button>
+              </Link>
             </div>
-            <div style={{ fontSize: '18px', color: '#444' }}>Planted Trees</div>
+          ))}
+        </div>
 
-            <hr style={{ border: '1px solid #ddd', margin: '20px 0' }} />
-
-            <div style={{ fontSize: '30px', fontWeight: 'bold', color: '#FFC107' }}>
-              <span role="img" aria-label="trophy">
-                🏆
-              </span>{' '}
-              1343
-            </div>
-            <div style={{ fontSize: '18px', color: '#444' }}>Total Points</div>
-
-            <hr style={{ border: '1px solid #ddd', margin: '20px 0' }} />
-
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#FF5722' }}>
-              <span role="img" aria-label="tree">
-                🌳
-              </span>{' '}
-              Most Planted Tree: <span style={{ fontWeight: 'bold', color: '#388E3C' }}>Hora Tree</span>
-            </div>
-
-            <hr style={{ border: '1px solid #ddd', margin: '20px 0' }} />
-
-            <div style={{ fontSize: '18px', color: '#444' }}>
-              <span role="img" aria-label="calendar">
-                📅
-              </span>{' '}
-              Joined Date: <span style={{ fontWeight: 'bold', color: '#388E3C' }}>23/06/2017</span>
-            </div>
+        {/* Leaderboard */}
+        <div className="leaderboard-section">
+          <h2>Leaderboard</h2>
+          <div className="leaderboard-cards">
+            {leaderboard.map((userItem, index) => (
+              <div
+                key={index}
+                className={`leaderboard-card ${userItem.username === user.username ? 'current-user' : ''}`}
+              >
+                <p>Rank: {index + 1}</p> {/* Display rank based on index */}
+                <p>Username: {userItem.username}</p>
+                <p>Points: {userItem.points}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

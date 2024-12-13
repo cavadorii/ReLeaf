@@ -20,13 +20,21 @@ tf.serialization.registerClass(CustomL2Regularizer);
 
 // Load model when server starts
 async function loadModel() {
-    const modelPath = path.resolve(__dirname, './../ml_model/model.json');
-    model = await tf.loadLayersModel(`file://${modelPath}`);
-    console.log("Model loaded successfully.");
+    try {
+        const modelPath = path.resolve(__dirname, './../ml_model/model.json');
+        model = await tf.loadLayersModel(`file://${modelPath}`);
+        console.log("Model loaded successfully.");
+    } catch (error) {
+        console.error("Error loading model:", error);
+    }
 }
 loadModel();
 
 async function predictTreePresence(imagePath) {
+    if (!model) {
+        throw new Error('Model not loaded. Please ensure the model is loaded before making predictions.');
+    }
+
     const imageBuffer = await sharp(imagePath)
         .resize({ width: 256, height: 256 })
         .toBuffer();
@@ -40,7 +48,6 @@ async function predictTreePresence(imagePath) {
 
     return treeProb > 0.5; // Return true if tree is detected
 }
-
 async function handleTreePhotoPrediction(req, res) {
     try {
         const imagePath = req.file.path;
@@ -54,5 +61,6 @@ async function handleTreePhotoPrediction(req, res) {
 }
 
 module.exports = {
-    handleTreePhotoPrediction
+    handleTreePhotoPrediction,
+    predictTreePresence
 };

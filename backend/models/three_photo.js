@@ -1,109 +1,145 @@
-// Import mongoose
-const mongoose = require('mongoose');
+const { client } = require('../config/database');
+const { ObjectId } = require('mongodb');
 
-// Define the tree photo schema
-const treePhotoSchema = new mongoose.Schema({
-  registration_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Registration',
-    required: true
-  },
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  event_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Event',
-    required: true
-  },
-  photo_url: {
-    type: String,
-    required: true
-  },
-  is_valid: {
-    type: Boolean,
-    default: false
-  },
-  uploaded_at: {
-    type: Date,
-    default: Date.now
-  }
-});
+const treePhotoCollection = client.db('Cluster0').collection('treePhotos');
 
-// Compile the model
-const TreePhoto = mongoose.model('TreePhoto', treePhotoSchema);
+const TreePhoto = {
+  // Create a new tree photo
+  create: async (data) => {
+    // const registrationId = ObjectId.isValid(data.registration_id) ? new ObjectId(data.registration_id) : null;
+    // const userId = ObjectId.isValid(data.user_id) ? new ObjectId(data.user_id) : null;
+    // const eventId = ObjectId.isValid(data.event_id) ? new ObjectId(data.event_id) : null;
 
-// CRUD Operations
+    // if (!registrationId || !userId || !eventId) {
+    //   throw new Error('Invalid registration_id, user_id, or event_id');
+    // }
 
-// Create a new tree photo
-async function createTreePhoto(data) {
-  try {
-    const treePhoto = new TreePhoto(data);
-    await treePhoto.save();
-    console.log("Tree photo created successfully");
-    return treePhoto;
-  } catch (error) {
-    console.error("Error creating tree photo:", error);
-    throw error;
-  }
-}
+    const registrationId = data.registration_id; // Skip ObjectId validation for testing
+    const userId = ObjectId.isValid(data.user_id) ? new ObjectId(data.user_id) : null;
+    const eventId = data.event_id; // Skip ObjectId validation for testing
 
-// Read (Get) a tree photo by ID
-async function getTreePhotoById(photoId) {
-  try {
-    const treePhoto = await TreePhoto.findById(photoId)
-      .populate('registration_id user_id event_id'); // Populate references if needed
+    if (!registrationId || !userId || !eventId) {
+      throw new Error('Invalid registration_id, user_id, or event_id');
+    }
+
+
+
+    const treePhotoData = {
+      ...data,
+      registration_id: registrationId,
+      user_id: userId,
+      event_id: eventId,
+      is_valid: data.is_valid || false,
+      uploaded_at: new Date().toISOString(),
+    };
+
+    const result = await treePhotoCollection.insertOne(treePhotoData);
+
+    return {
+      _id: result.insertedId,
+      ...treePhotoData,
+    };
+  },
+
+  // Find a tree photo by ID
+  findById: async (id) => {
+    console.log('findById called with ID:', id); // Debug the input ID
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid photo ID');
+    }
+  
+    const treePhoto = await treePhotoCollection.findOne({ _id: new ObjectId(id) });
+    console.log('Database result for ID:', treePhoto); // Debug the database result
+  
     if (!treePhoto) {
-      throw new Error("Tree photo not found");
+      throw new Error('Tree photo not found');
     }
+  
     return treePhoto;
-  } catch (error) {
-    console.error("Error fetching tree photo:", error);
-    throw error;
-  }
-}
+  },
+  
 
-// Update a tree photo by ID
-async function updateTreePhotoById(photoId, updateData) {
-  try {
-    const updatedTreePhoto = await TreePhoto.findByIdAndUpdate(
-      photoId,
-      updateData,
-      { new: true, runValidators: true }
+  // Update a tree photo by ID
+  updateById: async (id, updateData) => {
+    console.log('updateById called with ID:', id, 'and data:', updateData); // Debug inputs
+
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid photo ID');
+    }
+
+    if (!updateData || typeof updateData !== 'object' || Object.keys(updateData).length === 0) {
+      throw new Error('No valid update data provided');
+    }
+
+    const result = await treePhotoCollection.updateOne(
+      { _id: new ObjectId(id) }, // Match the photo by ID
+      { $set: updateData } // Update the specified fields
     );
-    if (!updatedTreePhoto) {
-      throw new Error("Tree photo not found");
+
+    console.log('Update operation result:', result); // Debug the update result
+
+    if (result.matchedCount === 0) {
+      throw new Error('Tree photo not found');
     }
-    console.log("Tree photo updated successfully");
+
+    // Fetch and return the updated document
+    const updatedTreePhoto = await treePhotoCollection.findOne({ _id: new ObjectId(id) });
     return updatedTreePhoto;
-  } catch (error) {
-    console.error("Error updating tree photo:", error);
-    throw error;
-  }
-}
+  },
 
-// Delete a tree photo by ID
-async function deleteTreePhotoById(photoId) {
-  try {
-    const deletedTreePhoto = await TreePhoto.findByIdAndDelete(photoId);
-    if (!deletedTreePhoto) {
-      throw new Error("Tree photo not found");
+  // Delete a tree photo by ID
+  deleteById: async (id) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid photo ID');
     }
-    console.log("Tree photo deleted successfully");
-    return deletedTreePhoto;
-  } catch (error) {
-    console.error("Error deleting tree photo:", error);
-    throw error;
-  }
-}
 
-// Export the model and CRUD functions
-module.exports = {
-  TreePhoto,
-  createTreePhoto,
-  getTreePhotoById,
-  updateTreePhotoById,
-  deleteTreePhotoById
+    const result = await treePhotoCollection.deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      throw new Error('Tree photo not found');
+    }
+
+    return true;
+  },
+
+  // Find all tree photos
+  findAll: async () => {
+    try {
+      // Retrieve all tree photos from the collection
+      const treePhotos = await treePhotoCollection.find().toArray();
+      return treePhotos;
+    } catch (error) {
+      console.error('Error fetching tree photos from database:', error.message);
+      throw new Error('Database fetch failed');
+    }
+  },
+
+  // Find tree photos by user ID
+  findByUserId: async (userId) => {
+    if (!ObjectId.isValid(userId)) {
+      throw new Error('Invalid user ID');
+    }
+
+    const treePhotos = await treePhotoCollection.find({ user_id: new ObjectId(userId) }).toArray();
+    if (treePhotos.length === 0) {
+      throw new Error('No tree photos found for the user');
+    }
+
+    return treePhotos;
+  },
+
+  // Find tree photos by event ID
+  findByEventId: async (eventId) => {
+    if (!ObjectId.isValid(eventId)) {
+      throw new Error('Invalid event ID');
+    }
+
+    const treePhotos = await treePhotoCollection.find({ event_id: new ObjectId(eventId) }).toArray();
+    if (treePhotos.length === 0) {
+      throw new Error('No tree photos found for the event');
+    }
+
+    return treePhotos;
+  },
 };
+
+module.exports = TreePhoto;

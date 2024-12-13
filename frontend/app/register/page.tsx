@@ -14,7 +14,6 @@ const Register: React.FC = () => {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-   // const [password, setPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
@@ -24,10 +23,6 @@ const Register: React.FC = () => {
       [e.target.name]: e.target.value,
     });
   };
-
-//  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //  setPassword(e.target.value);
-  //};
 
 
 
@@ -183,6 +178,7 @@ const Register: React.FC = () => {
                   color: '#789461',
                   cursor: 'pointer',
                   fontSize: '20px',
+                  
                 }}
               >
           {showPassword ? <VisibilityOff /> : <Visibility />}  
@@ -242,6 +238,8 @@ const Register: React.FC = () => {
               borderRadius: '8px',
               cursor: 'pointer',
               fontFamily: '"Quicksand", sans-serif',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+              transition: 'background-color 0.3s, transform 0.3s',
             }}
           >
             Register

@@ -1,36 +1,107 @@
-//models/User.js
-const mongoose = require('mongoose');
+const { client } = require('../config/database');
+const bcrypt = require('bcrypt');
+const { ObjectId } = require('mongodb');
 
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['volunteer', 'association'], default: 'volunteer' },
-  points: { type: Number, default: 0 },
-  created_at: { type: Date, default: Date.now }
-});
+const userCollection = client.db('Cluster0').collection('users');
 
-const User = mongoose.model('User', userSchema);
+const User = {
+  create: async (user) => {
+    const existingUser = await userCollection.findOne({
+      $or: [{ email: user.email }, { username: user.username }],
+    });
+    if (existingUser) {
+      throw new Error('Email or username already exists');
+    }
 
-//CRUD
-//CREATE
-async function createUser(data) {
-  return await User.create(data);
-}
+    user.password = await bcrypt.hash(user.password, 10);
+    user.points = 0;
+    user.created_at = new Date().toISOString();
 
-//Read by ID
-async function getUserById(id) {
-  return await User.findById(id);
-}
+    const result = await userCollection.insertOne({
+      username: user.username,
+      email: user.email,
+      password: user.password,
+      role: user.role || 'volunteer',
+      points: user.points,
+      created_at: user.created_at,
+    });
 
-//Update by ID
-async function updateUser(id, data) {
-  return await User.findByIdAndUpdate(id, data, { new: true });
-}
+    return {
+      _id: result.insertedId,
+      username: user.username,
+      email: user.email,
+      role: user.role || 'volunteer',
+      points: user.points,
+      created_at: user.created_at,
+    };
+  },
 
-//Delete by ID
-async function deleteUser(id) {
-  return await User.findByIdAndDelete(id);
-}
+  findById: async (id) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid user ID');
+    }
 
-module.exports = { User, createUser, getUserById, updateUser, deleteUser };
+    const user = await userCollection.findOne({ _id: new ObjectId(id) });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  },
+
+  updateById: async (id, data) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid user ID');
+    }
+
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, 10);
+    }
+
+    const result = await userCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: data }
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error('User not found');
+    }
+
+    // Fetch the updated user
+    const updatedUser = await userCollection.findOne({ _id: new ObjectId(id) });
+    return updatedUser;
+  },
+
+  deleteById: async (id) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid user ID');
+    }
+
+    const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      throw new Error('User not found');
+    }
+    return true;
+  },
+
+  findAll: async () => {
+    return await userCollection.find().toArray();
+  },
+
+  findByUsername: async (username) => {
+    const user = await userCollection.findOne({ username });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  },
+
+  findByEmail: async (email) => {
+    const user = await userCollection.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  },
+};
+
+module.exports = User;
