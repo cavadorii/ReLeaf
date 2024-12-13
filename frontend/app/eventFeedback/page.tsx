@@ -43,7 +43,6 @@ const EventFeedback: React.FC = () => {
             });
 
             if (response.status === 201) {
-                alert("Feedback added succesfully");
                 router.push('/event');
             }
         } catch (error) {
