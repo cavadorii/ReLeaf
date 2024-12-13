@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const { connectDB } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const predictRoutes = require('./routes/predictRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const treePhotoRoutes = require('./routes/treePhotoRoutes');
 const usersRoutes = require('./routes/usersRoutes');
@@ -21,6 +22,8 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/predict', predictRoutes);
+app.use('/api', feedbackRoutes);
 app.use('/api/predict', predictRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/tree-photos',treePhotoRoutes);
