@@ -6,29 +6,32 @@ import Rating from './Rating';
 
 
 const EventFeedback: React.FC = () => {
-    const [formData, setFormData] = useState({
-        rating: 0,
-        comment: '',
-    });
-    const [error, setError] = useState<string | null>(null);
-    const [volunteerID, setVolunteerID] = useState<string | null>(null);
-
-    const router = useRouter();
-
     const searchParams = useSearchParams();
     const event_id = searchParams.get('event_id');
-    if (!event_id) {
-        setError("No event ID provided");
-    }
-
+    
+    const [comment, setComment] = useState<string | null>(null);
     const [rating, setRating] = React.useState(0);
+    const [error, setError] = useState<string | null>(null);
+    const [volunteerID, setVolunteerID] = useState<string | null>(null);
+    const router = useRouter();
+
+
+    const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setComment(e.target.value);
+      };
 
     useEffect(() => {
         document.title = "Provide Feedback"
+
+        if (!event_id) {
+            setError("No event ID provided");
+        }
+
         const volunteer_id = localStorage.getItem('userId');
         if (!volunteer_id) {
             setError("You are not logged in");
-        } else {
+        }
+        else {
             setVolunteerID(volunteer_id);
         }
     }, []);
@@ -41,18 +44,10 @@ const EventFeedback: React.FC = () => {
           );
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        formData.rating = rating;
-        if (formData.rating < 1 || formData.rating > 5)
+        if (rating < 1 || rating > 5)
         {
             alert("Choose between 1 and 5 stars!");
             return;
@@ -62,8 +57,8 @@ const EventFeedback: React.FC = () => {
             const response = await axios.post('http://localhost:5000/api/feedback', {
                 event_id: event_id,
                 volunteer_id: volunteerID,
-                rating: Number(formData.rating),
-                comment: formData.comment
+                rating: Number(rating),
+                comment: comment
             });
 
             if (response.status === 201) {
@@ -123,7 +118,7 @@ const EventFeedback: React.FC = () => {
                             type='text'
                             name='comment'
                             placeholder='Comment'
-                            onChange={handleChange}
+                            onChange={handleCommentChange}
                             style={{
                                 width: '100%',
                                 padding: '12px',
