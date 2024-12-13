@@ -1,38 +1,53 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Rating from './Rating';
 
 
 const EventFeedback: React.FC = () => {
-    const [formData, setFormData] = useState({
-        event_id: 0,
-        volunteer_id: 0,
-        rating: 0,
-        comment: '',
-    });
-
+    const searchParams = useSearchParams();
+    const event_id = searchParams.get('event_id');
+    
+    const [comment, setComment] = useState<string | null>(null);
     const [rating, setRating] = React.useState(0);
+    const [error, setError] = useState<string | null>(null);
+    const [volunteerID, setVolunteerID] = useState<string | null>(null);
+    const router = useRouter();
+
+
+    const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setComment(e.target.value);
+      };
 
     useEffect(() => {
         document.title = "Provide Feedback"
-     }, []);
 
-    const router = useRouter();
+        if (!event_id) {
+            setError("No event ID provided");
+        }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
+        const volunteer_id = localStorage.getItem('userId');
+        if (!volunteer_id) {
+            setError("You are not logged in");
+        }
+        else {
+            setVolunteerID(volunteer_id);
+        }
+    }, []);
+
+    if (error || !volunteerID) {
+        return (
+            <div style={styles.container}>
+              <p style={styles.error}>{error}</p>
+            </div>
+          );
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        formData.rating = rating;
-        if (formData.rating < 1 || formData.rating > 5)
+        if (rating < 1 || rating > 5)
         {
             alert("Choose between 1 and 5 stars!");
             return;
@@ -40,14 +55,14 @@ const EventFeedback: React.FC = () => {
 
         try {
             const response = await axios.post('http://localhost:5000/api/feedback', {
-                event_id: Number(formData.event_id),
-                volunteer_id: Number(formData.volunteer_id),
-                rating: Number(formData.rating),
-                comment: formData.comment
+                event_id: event_id,
+                volunteer_id: volunteerID,
+                rating: Number(rating),
+                comment: comment
             });
 
             if (response.status === 201) {
-                router.push('/event');
+                router.push('/plantMe');
             }
         } catch (error) {
             console.error("Could not add the event: ", error);
@@ -86,64 +101,9 @@ const EventFeedback: React.FC = () => {
                 <h2 style={{ color: '#333', fontSize: '24px', marginBottom: '20px', fontWeight: 'bold' }}>Provide Feedback</h2>
             
                 <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '10px', textAlign: 'left', color: '#789461' }}>
-                        <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Event ID</label>
-                        <input
-                            type='number'
-                            name='event_id'
-                            placeholder='Event ID'
-                            onChange={handleChange}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                border: '1px solid #ddd',
-                                backgroundColor: '#fff',
-                                fontSize: '16px',
-                                color: '#333',
-                                fontFamily: '"Quicksand", sans-serif',
-                            }}
-                        />
-                    </div>
-
-                    <div style={{ marginBottom: '10px', textAlign: 'left', color: '#789461' }}>
-                        <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Volunteer ID</label>
-                        <input
-                            type='number'
-                            name='volunteer_id'
-                            placeholder='Volunteer ID'
-                            onChange={handleChange}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                border: '1px solid #ddd',
-                                backgroundColor: '#fff',
-                                fontSize: '16px',
-                                color: '#333',
-                                fontFamily: '"Quicksand", sans-serif',
-                            }}
-                        />
-                    </div>
-
+                    
                     <div style={{ marginBottom: '10px', textAlign: 'left', color: '#789461' }}>
                         <label style={{ fontSize: '14px', color: '#555', marginBottom: '8px', display: 'block' }}>Rating</label>
-                        {/* <input
-                            type='number'
-                            name='rating'
-                            placeholder='Rating (1 to 5)'
-                            onChange={handleChange}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                border: '1px solid #ddd',
-                                backgroundColor: '#fff',
-                                fontSize: '16px',
-                                color: '#333',
-                                fontFamily: '"Quicksand", sans-serif',
-                            }}
-                        /> */}
                         <Rating
                             count={5}
                             value={rating}
@@ -158,7 +118,7 @@ const EventFeedback: React.FC = () => {
                             type='text'
                             name='comment'
                             placeholder='Comment'
-                            onChange={handleChange}
+                            onChange={handleCommentChange}
                             style={{
                                 width: '100%',
                                 padding: '12px',
@@ -193,6 +153,23 @@ const EventFeedback: React.FC = () => {
             </div>
         </div>
     );
+};
+
+const styles: { [key: string]: React.CSSProperties } = {
+    container: {
+        padding: '20px',
+        fontFamily: '"Quicksand", sans-serif',
+        textAlign: 'center',
+        backgroundColor: '#F5F5F5',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    error: {
+        color: 'red',
+        fontSize: '18px',
+    },
 };
 
 export default EventFeedback;
