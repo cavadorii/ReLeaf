@@ -32,6 +32,7 @@ interface Event {
 const Profile: React.FC = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
+  const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [leaderboard, setLeaderboard] = useState<UserData[]>([]); // Changed to UserData array for correct typing
 
@@ -59,23 +60,49 @@ const Profile: React.FC = () => {
     if (user) {
       const fetchData = async () => {
         try {
+          const userId = localStorage.getItem('userId');
           // Fetch certificates for the user
           const certResponse = await axios.get(`http://localhost:5000/api/certificates/user/${user?._id}`);
           const certData = certResponse.data;
           setCertificates(certData);
           
-          // Fetch events
-          const eventsResponse = await axios.get('http://localhost:5000/api/events');
-          const eventsData = eventsResponse.data;
-          setEvents(eventsData);
-          
+          // Fetch user registrations
+          const registrationsResponse = await axios.get('http://localhost:5000/api/registrations');
+          if (!(registrationsResponse.status === 200)) {
+            throw new Error('Error fetching registrations');
+          }
+
+          console.log('Registrations Response:', registrationsResponse.data);
+
+
+          // Filter registrations for the logged-in user
+          const userRegistrations = Array.isArray(registrationsResponse.data.data)
+            ? registrationsResponse.data.data.filter(
+                (registration: any) => registration.user_id === userId
+              )
+            : [];
+
+
+          // Fetch full event details for each registration
+          const registeredEvents = await Promise.all(
+            userRegistrations.map(async (registration: any) => {
+              const eventResponse = await axios.get(
+                `http://localhost:5000/api/events/${registration.event_id}`
+              );
+              return eventResponse.data;
+            })
+          );
+
+          setRegisteredEvents(registeredEvents);
+
           // Fetch all users for the leaderboard
           const usersResponse = await axios.get('http://localhost:5000/api/users');
           const usersData = usersResponse.data;
 
           // Sort users by points in descending order
           const sortedUsers = usersData.sort((a: UserData, b: UserData) => b.points - a.points);
-          setLeaderboard(sortedUsers); // Set sorted users into leaderboard state
+          const top = sortedUsers.slice(0, 3);
+          setLeaderboard(top); // Set sorted users into leaderboard state
 
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -106,11 +133,14 @@ const Profile: React.FC = () => {
         {/* Upcoming Events */}
         <div className="events-section">
           <h2>Upcoming Events</h2>
-          {events.map((event, index) => (
+          {registeredEvents.map((event, index) => (
             <div key={index} className="event-card">
               <div className="event-info">
                 <h3>{event.title}</h3>
               </div>
+              <Link href={`/event?id=${event._id}`} passHref>
+                <button className="view-details-button">Details</button>
+              </Link>
             </div>
           ))}
         </div>

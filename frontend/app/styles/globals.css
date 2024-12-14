@@ -65,6 +65,11 @@
     margin-top: 10px;
 }
 
+.event-details-page{
+    background-color: #f0f4f8;
+    background: linear-gradient(to bottom, #B1C29E, #659287);
+}
+
 /* Main profile page */
 .profile-page {
     background-color: #f0f4f8;

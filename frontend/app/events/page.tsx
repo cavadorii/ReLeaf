@@ -18,6 +18,7 @@ const Event: React.FC = () => {
     padding: '20px',
     fontFamily: '"Quicksand", sans-serif',
     minHeight: '100vh',
+    background: 'linear-gradient(to bottom, #B1C29E, #659287)'
   };
 
   const headerStyle: React.CSSProperties = {
