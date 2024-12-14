@@ -1,6 +1,8 @@
 'use client'; // Mark as a client-side component
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import axios from 'axios';
+import '../styles/globals.css';
 
 const EventDetails: React.FC = () => {
   const [event, setEvent] = useState<any | null>(null);
@@ -25,20 +27,24 @@ const EventDetails: React.FC = () => {
 
       try {
         setLoading(true);
-        const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`);
-        if (!userResponse.ok) {
+        const userResponse = await axios.get(`http://localhost:5000/api/users/${userId}`);
+        if (!(userResponse.status == 200)) {
           throw new Error('User not found');
         }
-        const userData = await userResponse.json();
+        const userData = userResponse.data;
         if (userData.role === 'volunteer') {
           setIsVolunteer(true);
         }
 
-        const eventResponse = await fetch(`http://localhost:5000/api/events/${eventId}`);
-        if (!eventResponse.ok) {
+        const eventResponse = await axios.get(`http://localhost:5000/api/events/${eventId}`);
+        if (!(eventResponse.status == 200)) {
           throw new Error('Error fetching event details');
         }
-        const eventData = await eventResponse.json();
+        const eventData = eventResponse.data;
+
+        // Check if the user has already joined the event
+        const alreadyJoined = eventData.volunteers.some((volunteer: any) => volunteer.user_id === userId);
+        setIsJoined(alreadyJoined);
         setEvent(eventData);
       } catch (err: any) {
         setError(err.message);
@@ -66,7 +72,7 @@ const EventDetails: React.FC = () => {
 
       const newVolunteer = {
         user_id: userId,
-        status: 'pending',
+        status: 'Accepted',
       };
 
       const updatedEvent = {
@@ -74,15 +80,20 @@ const EventDetails: React.FC = () => {
         volunteers: [...event.volunteers, newVolunteer],
       };
 
-      const updateResponse = await fetch(`http://localhost:5000/api/events/${event._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedEvent),
-      });
+      const { _id, ...updatePayload } = updatedEvent;
 
-      if (updateResponse.ok) {
+      const updateResponse = await axios.put(`http://localhost:5000/api/events/${event._id}`, updatePayload);
+
+      const registration = {
+        event_id: updatedEvent._id,
+        user_id: userId,
+        status: "Accepted",
+        points_awarded: 0
+      }
+      console.log(registration);
+      const addRegistrationResponse = await axios.post(`http://localhost:5000/api/registrations`, registration);
+
+      if (updateResponse.status == 200 && addRegistrationResponse.status == 201) {
         setIsJoined(true);
         setPopupMessage('You have successfully joined the event!');
       } else {
@@ -117,7 +128,7 @@ const EventDetails: React.FC = () => {
     alignItems: 'center',
     padding: '20px',
     fontFamily: '"Quicksand", sans-serif',
-    paddingTop: '60px', 
+    paddingTop: '60px',
   };
 
   const boxStyle: React.CSSProperties = {
@@ -149,28 +160,27 @@ const EventDetails: React.FC = () => {
     padding: '10px 20px',
     fontSize: '16px',
     color: '#FFFFFF',
-    backgroundColor: '#54473F',
+    backgroundColor: isJoined ? '#A9A9A9' : '#54473F',
     border: 'none',
     borderRadius: '5px',
-    cursor: 'pointer',
+    cursor: isJoined ? 'not-allowed' : 'pointer',
     marginTop: '20px',
     alignSelf: 'center',
   };
 
-  
-const backButtonStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '10px',
-  left: '10px',
-  padding: '5px 10px',
-  fontSize: '16px',
-  color: '#FFFFFF',
-  backgroundColor: '#54473F',
-  border: 'none',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  zIndex: 10, 
-};
+  const backButtonStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: '10px',
+    left: '10px',
+    padding: '5px 10px',
+    fontSize: '16px',
+    color: '#FFFFFF',
+    backgroundColor: '#54473F',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    zIndex: 10,
+  };
 
   const popupStyle: React.CSSProperties = {
     marginTop: '10px',
@@ -179,7 +189,7 @@ const backButtonStyle: React.CSSProperties = {
   };
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className='event-details-page'>
       <div style={boxStyle}>
         <button style={backButtonStyle} onClick={handleBack}>Back</button>
         <h1 style={titleStyle}>{event.title}</h1>
@@ -190,9 +200,13 @@ const backButtonStyle: React.CSSProperties = {
           {new Date(event.end_date).toLocaleDateString()}
         </p>
 
-        (
-          <button style={joinButtonStyle} onClick={handleJoinEvent}>Join Event</button>
-        )
+        <button
+          style={joinButtonStyle}
+          onClick={handleJoinEvent}
+          disabled={isJoined}
+        >
+          {isJoined ? 'Already Joined' : 'Join Event'}
+        </button>
 
         {popupMessage && <div style={popupStyle}>{popupMessage}</div>}
       </div>
