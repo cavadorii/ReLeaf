@@ -1,4 +1,4 @@
-'use client'; // Mark as a client-side component
+'use client'; 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import axios from 'axios';
@@ -42,8 +42,11 @@ const EventDetails: React.FC = () => {
         }
         const eventData = eventResponse.data;
 
+        const volunteers = eventData.volunteers || [];
+      
         // Check if the user has already joined the event
-        const alreadyJoined = eventData.volunteers.some((volunteer: any) => volunteer.user_id === userId);
+        const alreadyJoined = volunteers.some((volunteer: any) => volunteer.user_id === userId);
+      
         setIsJoined(alreadyJoined);
         setEvent(eventData);
       } catch (err: any) {
@@ -64,8 +67,8 @@ const EventDetails: React.FC = () => {
       if (!userId) {
         throw new Error('User ID not found');
       }
-
-      if (event.volunteers.some((volunteer: any) => volunteer.user_id === userId)) {
+      const volunteers = event.volunteers && Array.isArray(event.volunteers) ? event.volunteers : [];
+      if (volunteers.some((volunteer: any) => volunteer.user_id === userId)) {
         setPopupMessage('You have already joined this event!');
         return;
       }
@@ -77,7 +80,7 @@ const EventDetails: React.FC = () => {
 
       const updatedEvent = {
         ...event,
-        volunteers: [...event.volunteers, newVolunteer],
+        volunteers: [...volunteers, newVolunteer],
       };
 
       const { _id, ...updatePayload } = updatedEvent;
