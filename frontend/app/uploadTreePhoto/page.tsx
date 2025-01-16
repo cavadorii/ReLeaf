@@ -50,7 +50,7 @@ const UploadTreePhoto: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchEventInformation = async () => {
       try {
         setPageLoading(true);
         const eventResponse = await axios.get(`http://localhost:5000/api/events/${eventId}`);
@@ -59,6 +59,10 @@ const UploadTreePhoto: React.FC = () => {
         }
         const eventData = eventResponse.data;
         setEventTitle(eventData.title);
+        setLocation({
+          latitude: eventData.location.coordinates.latitude,
+          longitude: eventData.location.coordinates.longitude,
+        });
       }
       catch (err: any) {
         console.error(err.message);
@@ -68,11 +72,15 @@ const UploadTreePhoto: React.FC = () => {
       }
     };
 
-    fetchEvent();
+    fetchEventInformation();
   }, []);
 
   // Automatically get user's current location
   useEffect(() => {
+    if (eventId) {
+        return;
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -164,7 +172,10 @@ const UploadTreePhoto: React.FC = () => {
         }}
       >
         <h2 style={{ color: '#789461', marginBottom: '20px' }}>Upload Tree Photo</h2>
-        <h2 style={{ color: '#789461', marginBottom: '20px' }}>Contribute to: {eventTitle}</h2>
+        {
+          eventId != null &&
+          <h2 style={{ color: '#789461', marginBottom: '20px' }}>Contribute to: {eventTitle}</h2>
+        }
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px', textAlign: 'left', color: '#789461' }}>
             <label style={{ fontSize: '14px', marginBottom: '8px', display: 'block' }}>Photo Name</label>
@@ -210,22 +221,25 @@ const UploadTreePhoto: React.FC = () => {
                 ? `Latitude: ${location.latitude}, Longitude: ${location.longitude}`
                 : 'Getting location...'}
             </p>
-            <button
-              type="button"
-              onClick={() => setIsMapOpen(true)}
-              style={{
-                width: '50%',
-                padding: '10px',
-                backgroundColor: '#789461',
-                color: '#fff',
-                fontSize: '14px',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              }}
-            >
-              Select Location
-            </button>
+            {
+              eventId == null &&
+              <button
+                type="button"
+                onClick={() => setIsMapOpen(true)}
+                style={{
+                  width: '50%',
+                  padding: '10px',
+                  backgroundColor: '#789461',
+                  color: '#fff',
+                  fontSize: '14px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+              >
+                Select Location
+              </button>
+            }
           </div>
           <button
             type="submit"
