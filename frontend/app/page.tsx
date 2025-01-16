@@ -20,6 +20,7 @@ const Home: React.FC = () => {
         <Link href="/eventCreate"></Link>
         <Link href="/uploadTreePhoto"></Link>
         <Link href="/events"></Link>
+        <Link href="/registerassociation">Register Association</Link>
       </nav>
       <Link href="/login">
       <button style={styles.startButton}>Start</button>
