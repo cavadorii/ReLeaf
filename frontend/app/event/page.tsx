@@ -225,10 +225,12 @@ const EventDetails: React.FC = () => {
           disabled={isJoined}
         >
           {isJoined ? 'Already Joined' : 'Join Event'}
-        </button>
+        </button>{' '}
 
-        {' '}
-        <button style={uploadTreePhotoButtonStyle} onClick={handleUploadTreePhoto}>Upload Tree Photo</button>
+        {
+          isJoined &&
+          <button style={uploadTreePhotoButtonStyle} onClick={handleUploadTreePhoto}>Upload Tree Photo</button>
+        }
 
         {popupMessage && <div style={popupStyle}>{popupMessage}</div>}
       </div>
