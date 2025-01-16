@@ -111,6 +111,10 @@ const EventDetails: React.FC = () => {
     router.back();
   };
 
+  const handleUploadTreePhoto = () => {
+    router.push(`/uploadTreePhoto/?eventId=${eventId}`);
+  }
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -171,6 +175,18 @@ const EventDetails: React.FC = () => {
     alignSelf: 'center',
   };
 
+  const uploadTreePhotoButtonStyle: React.CSSProperties = {
+    padding: '10px 20px',
+    fontSize: '16px',
+    color: '#FFFFFF',
+    backgroundColor: '#54473F',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '20px',
+    alignSelf: 'center',
+  };
+
   const backButtonStyle: React.CSSProperties = {
     position: 'absolute',
     top: '10px',
@@ -210,6 +226,9 @@ const EventDetails: React.FC = () => {
         >
           {isJoined ? 'Already Joined' : 'Join Event'}
         </button>
+
+        {' '}
+        <button style={uploadTreePhotoButtonStyle} onClick={handleUploadTreePhoto}>Upload Tree Photo</button>
 
         {popupMessage && <div style={popupStyle}>{popupMessage}</div>}
       </div>
