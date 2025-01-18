@@ -30,7 +30,7 @@ app.use("/api/users", usersRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
-app.use("/associations", associationRoutes);
+app.use("/api/associations", associationRoutes);
 
 
 const PORT = process.env.PORT || 5000;

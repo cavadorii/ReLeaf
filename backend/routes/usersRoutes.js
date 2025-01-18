@@ -5,7 +5,8 @@ const {
   updateUserController,
   deleteUserController,
   getAllUsersController,
-  getUserNameByIdController
+  getUserNameByIdController,
+  awardPointsController
 } = require('../controllers/usersController');
 
 const router = express.Router();
@@ -26,6 +27,9 @@ router.put('/:id', updateUserController);
 router.delete('/:id', deleteUserController);
 
 router.get('/username/:id', getUserNameByIdController);
+
+router.post('/award-points', awardPointsController);
+
 
 
 module.exports = router;

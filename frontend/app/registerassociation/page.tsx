@@ -24,7 +24,7 @@ const RegisterAssociation: React.FC = () => {
     try {
       // Send the data to the backend
       const response = await axios.post(
-        "http://localhost:5000/api/associations/register $$$$ SCHIMBATI ASTA $$$$$",
+        "http://localhost:5000/api/associations",
         {
           name: formData.name,
           description: formData.description,
@@ -106,6 +106,7 @@ const RegisterAssociation: React.FC = () => {
                 backgroundColor: "#fff",
                 fontSize: "16px",
                 fontFamily: '"Quicksand", sans-serif',
+                color: "#000",
               }}
             />
           </div>
@@ -135,6 +136,7 @@ const RegisterAssociation: React.FC = () => {
                 backgroundColor: "#fff",
                 fontSize: "16px",
                 fontFamily: '"Quicksand", sans-serif',
+                color: "#000"
               }}
             />
           </div>

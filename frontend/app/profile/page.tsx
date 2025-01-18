@@ -65,6 +65,7 @@ const Profile: React.FC = () => {
           const userId = localStorage.getItem('userId');
           const certResponse = await axios.get(`http://localhost:5000/api/certificates/user/${user?._id}`);
           const certData = certResponse.data;
+          console.log(certData);
           setCertificates(certData);
 
           const registrationsResponse = await axios.get('http://localhost:5000/api/registrations');
@@ -112,6 +113,33 @@ const Profile: React.FC = () => {
     }
   }, [user]);
 
+  const createCertificate = async (eventId: string, eventName: string) => {
+    try {
+      const userId = user?._id;  // Get user ID from state
+      if (!userId) {
+        console.error('User ID is missing');
+        return;
+      }
+  
+      const response = await axios.post('http://localhost:5000/api/certificates', {
+        userId: userId,
+        eventId: eventId,
+        eventName: eventName,
+      });
+  
+      if (response.status === 201) {
+        alert('Certificate created successfully!');
+        setCertificates((prevCertificates) => [...prevCertificates, response.data]); // Add to state
+      } else {
+        alert('Failed to create certificate');
+      }
+    } catch (error) {
+      console.error('Error creating certificate:', error);
+      alert('Error creating certificate');
+    }
+  };
+  
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -124,7 +152,12 @@ const Profile: React.FC = () => {
         location={user.location}
         points={user.points}
       />
-      
+
+      <Link href={`/registerassociation`} passHref>
+        <button className="view-details-button">Register association</button>
+      </Link>
+
+
       <div className="sections-container">
         
         {/* Upcoming Events */}
@@ -151,8 +184,14 @@ const Profile: React.FC = () => {
                 <h3>{event.title}</h3>
               </div>
               <Link href={`/eventFeedback?event_id=${event._id}`} passHref>
-                <button className="feedback-button">Feedback</button>
+                <button className="create-certificate-button" >Feedback</button>
               </Link>
+                <button
+                  className="create-certificate-button"
+                  onClick={() => createCertificate(event._id, event.title)} // Call the function when clicked
+                >
+                  Create Certificate
+                </button>
             </div>
           ))}
         </div>
@@ -162,7 +201,7 @@ const Profile: React.FC = () => {
           <h2>Certificates</h2>
           {certificates.map((certificate) => (
             <div key={certificate._id} className="certificate-card">
-              <p>Certificate id: {certificate._id}</p>
+              <p>Certificate for {certificate.eventName}</p>
               <p>Issued At: {certificate.issued_at.toString()}</p>
               <Link href={`/certificate?id=${certificate._id}`} passHref>
                 <button className="view-details-button">View/Download</button>

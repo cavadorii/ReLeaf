@@ -70,6 +70,34 @@ async function getUserNameByIdController(req, res) {
   }
 }
 
+// Award points to a user
+async function awardPointsController(req, res) {
+  try {
+    const { userId } = req.body; // User ID
+    const { points } = req.body; // Points to be awarded
+
+    // Ensure points are valid
+    if (typeof points !== "number" || points <= 0) {
+      return res.status(400).json({ error: "Invalid points value." });
+    }
+
+    // Find and update the user
+    const user = await User.updatePointsById(userId, points);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully awarded ${points} points.`,
+      user,
+    });
+  } catch (error) {
+    console.error("Error awarding points:", error.message);
+    res.status(500).json({ error: "An error occurred while awarding points." });
+  }
+}
 
 module.exports = {
   createUserController,
@@ -77,5 +105,6 @@ module.exports = {
   updateUserController,
   deleteUserController,
   getAllUsersController,
-  getUserNameByIdController
+  getUserNameByIdController,
+  awardPointsController
 };

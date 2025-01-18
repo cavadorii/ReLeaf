@@ -70,6 +70,26 @@ const User = {
     const updatedUser = await userCollection.findOne({ _id: new ObjectId(id) });
     return updatedUser;
   },
+  
+  updatePointsById: async (id, points) => {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid user ID');
+    }
+  
+    const result = await userCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $inc: { points: points } }  // Increment points by the specified value
+    );
+  
+    if (result.matchedCount === 0) {
+      throw new Error('User not found');
+    }
+  
+    // Fetch the updated user
+    const updatedUser = await userCollection.findOne({ _id: new ObjectId(id) });
+    return updatedUser;
+  },
+  
 
   deleteById: async (id) => {
     if (!ObjectId.isValid(id)) {

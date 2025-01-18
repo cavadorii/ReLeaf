@@ -171,6 +171,21 @@
     border-radius: 5px;
   }
 
+  .create-certificate-button {
+    color: #000;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .create-certificate-button:hover {
+    background-color: #45a049;
+  }
+  
+
 /* Highlight for the current user */
 .leaderboard-card.current-user {
     background-color: #659287; /* Green background to highlight the current user */
