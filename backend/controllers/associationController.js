@@ -16,6 +16,32 @@ const AssociationController = {
     }
   },
 
+  getAssociationByName: async (req, res) => {
+    try {
+      const { name } = req.query;
+      // console.log("Searching for association with name:", name);
+  
+      if (!name) {
+        return res.status(400).json({ error: "Association name is required" });
+      }
+  
+      // Perform case-insensitive search
+      const association = await Association.getCollection().findOne({
+        name: { $regex: new RegExp(`^${name}$`, "i") }, // Case-insensitive regex
+      });
+  
+      if (!association) {
+        return res.status(404).json({ error: "Association not found" });
+      }
+  
+      // console.log("Association found:", association);
+      res.status(200).json(association);
+    } catch (error) {
+      console.error("Error fetching association:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+  
   createAssociation: async (req, res) => {
     try {
       const association = await Association.create(req.body);

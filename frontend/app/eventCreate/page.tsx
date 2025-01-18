@@ -1,7 +1,7 @@
 'use client'; // Mark as a client-side component
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import { LatLng } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -24,14 +24,26 @@ const EventCreate: React.FC = () => {
     location: { address: '', coordinates: { latitude: 0, longitude: 0 } },
     start_date: '',
     end_date: '',
+    association_id: '', // Add association_id to the eventData state
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const searchParams = useSearchParams(); // Get URL query parameters
+
+  // Extract association_id from the URL query
+  useEffect(() => {
+    const associationId = searchParams.get('association');
+    if (associationId) {
+      setEventData((prev) => ({ ...prev, association_id: associationId }));
+    } else {
+      setError('Association ID is missing from the URL.');
+    }
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     // Handle address and location state separately
     if (name === 'address') {
       setEventData({
@@ -168,7 +180,7 @@ const EventCreate: React.FC = () => {
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <LocationPicker setLocation={(latLng) => setEventData({
               ...eventData,
-              location: { 
+              location: {
                 address: eventData.location.address, // Preserve address
                 coordinates: { latitude: latLng.lat, longitude: latLng.lng }
               }

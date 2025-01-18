@@ -11,6 +11,9 @@ router.post("/", AssociationController.createAssociation);
 // Get an association by ID
 router.get("/:associationId", AssociationController.getAssociationById);
 
+// Get an association by name
+router.get("/", AssociationController.getAssociationByName); // Query parameter for name
+
 // Update an association by ID
 router.put("/:associationId", AssociationController.updateAssociation);
 
