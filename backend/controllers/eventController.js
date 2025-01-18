@@ -29,6 +29,30 @@ const eventController = {
     }
   },
 
+  getEventsByAssociationId: async (req, res) => {
+    try {
+      const { associationId } = req.params;
+      // console.log(associationId)
+  
+      if (!associationId) {
+        return res.status(400).json({ error: 'Association ID is required.' });
+      }
+  
+      const events = await Event.getEventsByAssociationId(associationId);
+  
+      if (!events || events.length === 0) {
+        return res.status(404).json({ error: 'No events found for the given association ID.' });
+      }
+  
+      res.status(200).json(events);
+    } catch (error) {
+      console.error('Error in getEventsByAssociationId:', error);
+      res.status(500).json({ error: error.message || 'An error occurred while fetching events.' });
+    }
+  },
+  
+
+
   updateEvent: async (req, res) => {
     try {
       const count = await Event.updateById(req.params.id, req.body);

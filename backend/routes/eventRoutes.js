@@ -4,13 +4,12 @@ const authenticateToken = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
+router.get('/association/:associationId', eventController.getEventsByAssociationId);
 router.post('/', eventController.createEvent);
 router.get('/', eventController.getEvents);
 router.get('/:id', eventController.getEventById);
 router.put('/:id', eventController.updateEvent);
 router.delete('/:id', authenticateToken, eventController.deleteEvent);
 router.get('/:id/volunteers', eventController.getEventVolunteers);
-
-
 
 module.exports = router;

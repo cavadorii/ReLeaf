@@ -29,7 +29,14 @@ const Event = {
     const { ObjectId } = require('mongodb');
     const result = await eventsCollection.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount;
+  },
+
+  getEventsByAssociationId: async (associationId) => {
+    return await eventsCollection
+      .find({ association_id: associationId })
+      .toArray();
   }
+  
 };
 
 module.exports = Event;

@@ -8,12 +8,14 @@ import {
   ReceiptText,
   Bot,
   User,
+  Users,
 } from "lucide-react";
 
 const items = [
   { title: "Home", url: "/plantMe", icon: <Home /> },
   { title: "Events", url: "/events", icon: <ReceiptText /> },
   { title: "Profile", url: "/profile", icon: <User /> },
+  { title: "Association", url: "/association", icon: <Users /> },
 ];
 
 export function AppSidebar() {

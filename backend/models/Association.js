@@ -1,73 +1,58 @@
-const mongoose = require("mongoose");
+const { client } = require("../config/database");
 
-const associationSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const Association = {
+  getCollection: () => client.db("Cluster0").collection("associations"),
+  async create(data) {
+    const collection = this.getCollection();
+    const result = await collection.insertOne(data);
+    return { _id: result.insertedId, ...data }; // Return the inserted document with its ID
   },
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  created_at: { type: Date, default: Date.now },
-  events: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }], // Tracks events created by the association
-  volunteers: [
-    {
-      user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      total_planted_trees: { type: Number, default: 0 }, // Tracks the total trees planted by the volunteer
-    },
-  ],
-});
+  
+  async findById(id) {
+    const collection = this.getCollection();
+    const objectId = require("mongodb").ObjectId;
+    return await collection.findOne({ _id: new objectId(id) });
+  },
 
-const Association = mongoose.model("Association", associationSchema);
+  async updateById(id, data) {
+    const collection = this.getCollection();
+    const objectId = require("mongodb").ObjectId;
+    const result = await collection.findOneAndUpdate(
+      { _id: new objectId(id) },
+      { $set: data },
+      { returnDocument: "after" }
+    );
+    return result.value;
+  },
 
-// CRUD Operations
-// Create
-async function createAssociation(data) {
-  return await Association.create(data);
-}
+  async deleteById(id) {
+    const collection = this.getCollection();
+    const objectId = require("mongodb").ObjectId;
+    const result = await collection.deleteOne({ _id: new objectId(id) });
+    return result.deletedCount > 0;
+  },
 
-// Read by ID
-async function getAssociationById(id) {
-  return await Association.findById(id)
-    .populate("user_id")
-    .populate("events")
-    .populate("volunteers.user_id");
-}
+  async addEventToAssociation(id, eventId) {
+    const collection = this.getCollection();
+    const objectId = require("mongodb").ObjectId;
+    const result = await collection.findOneAndUpdate(
+      { _id: new objectId(id) },
+      { $push: { events: eventId } },
+      { returnDocument: "after" }
+    );
+    return result.value;
+  },
 
-// Update by ID
-async function updateAssociation(id, data) {
-  return await Association.findByIdAndUpdate(id, data, { new: true });
-}
-
-// Add an event to the association
-async function addEventToAssociation(associationId, eventId) {
-  return await Association.findByIdAndUpdate(
-    associationId,
-    { $push: { events: eventId } },
-    { new: true }
-  );
-}
-
-// Update volunteer tree count
-async function updateVolunteerTreeCount(associationId, userId, treesPlanted) {
-  return await Association.findOneAndUpdate(
-    { _id: associationId, "volunteers.user_id": userId },
-    { $inc: { "volunteers.$.total_planted_trees": treesPlanted } },
-    { new: true, upsert: true } // Upsert ensures the volunteer is added if not already present
-  );
-}
-
-// Delete by ID
-async function deleteAssociation(id) {
-  return await Association.findByIdAndDelete(id);
-}
-
-module.exports = {
-  Association,
-  createAssociation,
-  getAssociationById,
-  updateAssociation,
-  addEventToAssociation,
-  updateVolunteerTreeCount,
-  deleteAssociation,
+  async updateVolunteerTreeCount(associationId, userId, treesPlanted) {
+    const collection = this.getCollection();
+    const objectId = require("mongodb").ObjectId;
+    const result = await collection.findOneAndUpdate(
+      { _id: new objectId(associationId), "volunteers.user_id": new objectId(userId) },
+      { $inc: { "volunteers.$.total_planted_trees": treesPlanted } },
+      { returnDocument: "after" }
+    );
+    return result.value;
+  },
 };
+
+module.exports = Association;
