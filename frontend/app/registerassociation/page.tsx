@@ -20,26 +20,37 @@ const RegisterAssociation: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     try {
+      // Retrieve userId from localStorage
+      const userId = localStorage.getItem("userId");
+  
+      // Check if userId exists
+      if (!userId) {
+        alert("User is not logged in. Please log in to register an association.");
+        return;
+      }
+  
       // Send the data to the backend
       const response = await axios.post(
         "http://localhost:5000/api/associations",
         {
+          user_id: userId, // Include the userId from localStorage
           name: formData.name,
           description: formData.description,
         }
       );
-
+  
       if (response.status === 201) {
         alert("Association registered successfully!");
         router.push("/plantMe"); // Redirect to plantME ### CHANGE ###
       }
-    } catch (error) {
-      console.error("Error registering association:", error);
+    } catch (error: any) {
+      console.error("Error response:", error.response?.data || error.message);
       alert("An error occurred. Please try again.");
     }
   };
+  
 
   return (
     <div

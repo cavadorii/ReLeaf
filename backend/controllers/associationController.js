@@ -4,12 +4,11 @@ const AssociationController = {
   getAssociationProfile: async (req, res) => {
     try {
       const { associationId } = req.params;
-      const association = await Association.findById(associationId)
-        .populate({
-          path: "events",
-          populate: { path: "volunteers.user_id", select: "name email" },
-        })
-        .populate("volunteers.user_id", "name email");
+      const association = await Association.findById(associationId);
+
+      if (!association) {
+        return res.status(404).json({ error: "Association not found" });
+      }
 
       res.status(200).json(association);
     } catch (error) {
@@ -30,9 +29,11 @@ const AssociationController = {
     try {
       const { associationId } = req.params;
       const association = await Association.findById(associationId);
+
       if (!association) {
         return res.status(404).json({ error: "Association not found" });
       }
+
       res.status(200).json(association);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -42,14 +43,12 @@ const AssociationController = {
   updateAssociation: async (req, res) => {
     try {
       const { associationId } = req.params;
-      const updatedAssociation = await Association.findByIdAndUpdate(
-        associationId,
-        req.body,
-        { new: true }
-      );
+      const updatedAssociation = await Association.updateById(associationId, req.body);
+
       if (!updatedAssociation) {
         return res.status(404).json({ error: "Association not found" });
       }
+
       res.status(200).json(updatedAssociation);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -59,10 +58,12 @@ const AssociationController = {
   deleteAssociation: async (req, res) => {
     try {
       const { associationId } = req.params;
-      const deletedAssociation = await Association.findByIdAndDelete(associationId);
-      if (!deletedAssociation) {
+      const deleted = await Association.deleteById(associationId);
+
+      if (!deleted) {
         return res.status(404).json({ error: "Association not found" });
       }
+
       res.status(200).json({ message: "Association deleted successfully" });
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -73,13 +74,13 @@ const AssociationController = {
     try {
       const { associationId } = req.params;
       const { event } = req.body;
-      const association = await Association.findById(associationId);
-      if (!association) {
+      const updatedAssociation = await Association.addEventToAssociation(associationId, event);
+
+      if (!updatedAssociation) {
         return res.status(404).json({ error: "Association not found" });
       }
-      association.events.push(event);
-      await association.save();
-      res.status(200).json(association);
+
+      res.status(200).json(updatedAssociation);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -89,22 +90,17 @@ const AssociationController = {
     try {
       const { associationId, userId } = req.params;
       const { treeCount } = req.body;
-      const association = await Association.findById(associationId);
-      if (!association) {
-        return res.status(404).json({ error: "Association not found" });
-      }
-
-      const volunteer = association.volunteers.find(
-        (vol) => vol.user_id.toString() === userId
+      const updatedAssociation = await Association.updateVolunteerTreeCount(
+        associationId,
+        userId,
+        treeCount
       );
-      if (!volunteer) {
-        return res.status(404).json({ error: "Volunteer not found" });
+
+      if (!updatedAssociation) {
+        return res.status(404).json({ error: "Association or Volunteer not found" });
       }
 
-      volunteer.totalPlantedTrees = treeCount;
-      await association.save();
-
-      res.status(200).json(association);
+      res.status(200).json(updatedAssociation);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
