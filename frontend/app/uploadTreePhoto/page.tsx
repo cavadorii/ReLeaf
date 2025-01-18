@@ -128,12 +128,12 @@ const UploadTreePhoto: React.FC = () => {
           const pointsResponse = await fetch(`http://localhost:5000/api/users/award-points`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, points: 5 }),
+            body: JSON.stringify({ userId, points: 1 }),
           });
   
           if (pointsResponse.ok) {
-            alert('Photo metadata saved successfully. You have been awarded 5 points!');
-            router.push('/plantMe');
+            alert('Photo metadata saved successfully. You have been awarded 1 point!');
+            router.push('/profile');
           } else {
             console.error('Failed to award points to the user.');
             alert('Photo metadata saved successfully, but points could not be awarded.');

@@ -76,7 +76,7 @@ const EventFeedback: React.FC = () => {
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh', 
-            backgroundColor: '#f4f7fa', 
+            background: 'linear-gradient(to bottom, #B1C29E, #659287)', 
             backgroundSize: 'cover', 
             backgroundPosition: 'center', 
             padding: '20px',
@@ -85,11 +85,11 @@ const EventFeedback: React.FC = () => {
         }}>
 
             <div style = {{
-                backgroundColor: '#CBD2A4',
+                background: 'white',
                 borderRadius: '10px',
                 boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
                 width: '100%',
-                height: '105%',
+                height: '50%',
                 maxWidth: '400px',
                 padding: '30px',
                 textAlign: 'center',

@@ -15,7 +15,7 @@ const leaderboardRoutes = require("./routes/leaderboardRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const registrationRoutes = require("./routes/registrationRoutes");
-
+const feedbackRoutes = require("./routes/feedbackRoutes");
 
 const app = express();
 app.use(cors());
@@ -31,6 +31,7 @@ app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
 app.use("/api/associations", associationRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 
 const PORT = process.env.PORT || 5000;

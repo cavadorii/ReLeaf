@@ -17,8 +17,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ username, profilePic, location, poi
       <p className="location">{location}</p>
       <div className="stats">
         <div>
-          <span className="number">{points}</span>
-          <p>Points</p>
+          <span className="number">🌳 {points}</span>
+          <p></p>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ const feedbackController = require('../controllers/feedbackController');
 
 const router = express.Router();
 
-router.post('/feedback', feedbackController.writeEventFeedback);
+router.post('/', feedbackController.writeEventFeedback);
 router.get('/feedback/:id', feedbackController.getEventFeedbackById);
 router.get('/feedbacks', feedbackController.getAllEventFeedbacks);
 router.get('/averageRating/:event_id', feedbackController.getAverageEventRating);

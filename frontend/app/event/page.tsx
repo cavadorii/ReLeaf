@@ -284,13 +284,20 @@ const EventDetails: React.FC = () => {
           {isJoined ? 'Already Joined' : 'Join Event'}
         </button>
 
-        {isJoined && new Date(event.end_date) >= new Date() ? (
+        {isJoined && new Date(event.end_date) >= new Date() && (
           <button style={uploadTreePhotoButtonStyle} onClick={handleUploadTreePhoto}>
             Upload Tree Photo
           </button>
-        ) : (
-          <p style={{ color: '#FF0000', marginTop: '20px' }}>Event finished</p>
-        )}
+        ) }
+        
+        {new Date(event.end_date) < new Date() &&
+          (
+            <p style={{ color: '#FF0000', marginTop: '20px' }}>Event finished</p>
+          )
+        }
+        
+        
+        
 
 
 
