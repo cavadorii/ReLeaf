@@ -1,4 +1,4 @@
-const Leaderboard = require('../models/leaderboard');
+const Leaderboard = require("../models/leaderboard");
 
 const leaderboardController = {
   // Create a new leaderboard entry
@@ -14,18 +14,18 @@ const leaderboardController = {
       const createdEntry = await Leaderboard.create(newEntry);
 
       res.status(201).json({
-        message: 'Leaderboard entry created successfully',
+        message: "Leaderboard entry created successfully",
         entry: createdEntry,
       });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   },
-  getAllEntries:async(req,res)=>{
-    try{
-      const entries=await Leaderboard.findAll();
-      if(!entries){
-        return res.status(404).json({ error: 'Leaderboard entries not found' });
+  getAllEntries: async (req, res) => {
+    try {
+      const entries = await Leaderboard.findAll();
+      if (!entries) {
+        return res.status(404).json({ error: "Leaderboard entries not found" });
       }
       res.status(200).json(entries);
     } catch (error) {
@@ -40,7 +40,7 @@ const leaderboardController = {
     try {
       const entry = await Leaderboard.findById(id);
       if (!entry) {
-        return res.status(404).json({ error: 'Leaderboard entry not found' });
+        return res.status(404).json({ error: "Leaderboard entry not found" });
       }
 
       res.status(200).json(entry);
@@ -58,15 +58,35 @@ const leaderboardController = {
       const updatedEntry = await Leaderboard.updateById(id, updates);
 
       if (!updatedEntry.modifiedCount) {
-        return res.status(404).json({ error: 'Leaderboard entry not found' });
+        return res.status(404).json({ error: "Leaderboard entry not found" });
       }
 
       res.status(200).json({
-        message: 'Leaderboard entry updated successfully',
+        message: "Leaderboard entry updated successfully",
         updatedEntry,
       });
     } catch (error) {
       res.status(400).json({ error: error.message });
+    }
+  },
+
+  calculateLeaderboard: async (req, res) => {
+    try {
+      const { eventId } = req.params;
+
+      const entries = await Leaderboard.find({ event_id: eventId }).sort({
+        points: -1,
+      });
+      for (let i = 0; i < entries.length; i++) {
+        entries[i].rank = i + 1;
+        await entries[i].save();
+      }
+
+      res
+        .status(200)
+        .json({ message: "Leaderboard updated", leaderboard: entries });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 
@@ -78,10 +98,12 @@ const leaderboardController = {
       const deletedEntry = await Leaderboard.deleteById(id);
 
       if (!deletedEntry.deletedCount) {
-        return res.status(404).json({ error: 'Leaderboard entry not found' });
+        return res.status(404).json({ error: "Leaderboard entry not found" });
       }
 
-      res.status(200).json({ message: 'Leaderboard entry deleted successfully' });
+      res
+        .status(200)
+        .json({ message: "Leaderboard entry deleted successfully" });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
