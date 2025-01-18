@@ -44,7 +44,7 @@
 .stats {
     display: flex;
     justify-content: space-around;
-    margin-top: 20px;
+    margin-top: 40px;
     font-size: 1rem; 
 }
 
@@ -63,6 +63,11 @@
     font-size: 1rem;
     color: #cfd8dc;
     margin-top: 10px;
+}
+
+.event-details-page{
+    background-color: #f0f4f8;
+    background: linear-gradient(to bottom, #B1C29E, #659287);
 }
 
 /* Main profile page */
@@ -101,7 +106,8 @@
 
 .events-section,
 .certificates-section,
-.leaderboard-section {
+.leaderboard-section,
+.past-events-section {
     flex: 1; /* Allow sections to share available space */
     background-color: #CBD2A4;
     padding: 20px;
@@ -131,7 +137,8 @@
 /* Section Titles */
 .events-section h2,
 .certificates-section h2,
-.leaderboard-section h2 {
+.leaderboard-section h2,
+.past-events-section h2{
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 10px;
@@ -142,7 +149,8 @@
 /* Optional hover effects */
 .events-section h2:hover,
 .certificates-section h2:hover,
-.leaderboard-section h2:hover {
+.leaderboard-section h2:hover,
+.past-events-section h2:hover {
     color: #4CAF50;
 }
 
@@ -151,14 +159,23 @@
     display: flex;
     flex-direction: column; /* Stack cards naturally */
     gap: 10px; /* Add space between cards */
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
 }
+
+.leaderboard-card {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
 
 /* Highlight for the current user */
 .leaderboard-card.current-user {
     background-color: #659287; /* Green background to highlight the current user */
     color: #ffffff; /* White text for contrast */
     font-weight: bold; /* Make the text stand out */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect */
     transform: scale(1.05); /* Slightly enlarge for emphasis */
     transition: transform 0.3s ease, background-color 0.3s ease;
 }

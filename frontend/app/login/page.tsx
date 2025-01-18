@@ -136,6 +136,8 @@ const Login: React.FC = () => {
               borderRadius: '8px',
               cursor: 'pointer',
               fontFamily: '"Quicksand", sans-serif',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+            transition: 'background-color 0.3s, transform 0.3s',
             }}
           >
             Login
@@ -145,6 +147,7 @@ const Login: React.FC = () => {
             fontSize: '14px',
             color: '#54473F',
             fontFamily: '"Quicksand", sans-serif',
+            
           }}>
             Don’t have an account?{' '}
             <a

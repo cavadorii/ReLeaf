@@ -3,16 +3,14 @@ const Leaderboard = require("../models/leaderboard");
 const leaderboardController = {
   // Create a new leaderboard entry
   createEntry: async (req, res) => {
-    const { event_id, user_id, points, rank } = req.body;
+    const { event_id, user_id, points } = req.body;
 
     try {
-      if (!event_id || !user_id || !rank) {
-        return res
-          .status(400)
-          .json({ error: "event_id, user_id, and rank are required" });
+      if (!event_id || !user_id) {
+        return res.status(400).json({ error: 'event_id and user_id required' });
       }
 
-      const newEntry = { event_id, user_id, points, rank };
+      const newEntry = { event_id, user_id, points };
       const createdEntry = await Leaderboard.create(newEntry);
 
       res.status(201).json({

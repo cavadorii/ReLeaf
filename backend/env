@@ -1,0 +1,4 @@
+MONGODB_URI=mongodb+srv://cavadoriiubb:f3ShLzpsppDuwC5s@cluster0.vdyzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=iosifsefulnostru
+PORT=5000
+NODE_ENV=development

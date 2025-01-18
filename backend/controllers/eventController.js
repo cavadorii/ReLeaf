@@ -39,6 +39,17 @@ const eventController = {
     }
   },
 
+  getEventVolunteers: async (req, res) => {
+    try {
+      const event = await Event.findById(req.params.id);
+      if (!event) return res.status(404).json({ error: 'Event not found' });
+      res.status(200).json(event.volunteers || []);
+    } catch (error) {
+      res.status(500).json({ error: error.toString() });
+    }
+  },
+
+
   deleteEvent: async (req, res) => {
     try {
       const count = await Event.deleteById(req.params.id);

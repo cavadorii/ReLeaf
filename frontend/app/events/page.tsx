@@ -1,6 +1,11 @@
-'use client'; // This marks the component as a client-side component
+'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const EventMapComponent = dynamic(() => import('../components/EventMapComponent'), {
+  ssr: false,
+});
 
 const Event: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
@@ -18,25 +23,25 @@ const Event: React.FC = () => {
     padding: '20px',
     fontFamily: '"Quicksand", sans-serif',
     minHeight: '100vh',
+    background: 'linear-gradient(to bottom, #B1C29E, #659287)',
   };
 
   const headerStyle: React.CSSProperties = {
     fontSize: '24px',
-    marginBottom: '100px',
+    marginBottom: '40px',
     color: '#54473F',
     fontWeight: 'bold',
   };
 
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+  const cardListStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
     gap: '20px',
     width: '100%',
-    maxWidth: '1200px',
-    alignItems: 'center',
+    maxWidth: '600px',
   };
 
-  const eventBoxStyle: React.CSSProperties = {
+  const eventCardStyle: React.CSSProperties = {
     backgroundColor: '#CBD2A4',
     borderRadius: '10px',
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
@@ -53,15 +58,10 @@ const Event: React.FC = () => {
     marginBottom: '10px',
   };
 
-  const eventDateStyle: React.CSSProperties = {
-    fontSize: '14px',
-    color: '#789461',
-    marginBottom: '5px',
-  };
-
-  const eventLocationStyle: React.CSSProperties = {
+  const eventDetailStyle: React.CSSProperties = {
     fontSize: '14px',
     color: '#555',
+    marginBottom: '10px',
   };
 
   const paginationStyle: React.CSSProperties = {
@@ -79,10 +79,6 @@ const Event: React.FC = () => {
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '16px',
-  };
-
-  const handleEventClick = (id: string) => {
-    localStorage.setItem('Id', id);
   };
 
   const paginate = (direction: 'next' | 'prev') => {
@@ -121,7 +117,6 @@ const Event: React.FC = () => {
     return <div style={containerStyle}>Error: {error}</div>;
   }
 
-  // Pagination logic
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
@@ -129,18 +124,32 @@ const Event: React.FC = () => {
   return (
     <div style={containerStyle}>
       <div style={headerStyle}>Upcoming Events</div>
-      <div style={gridStyle}>
+      <div style={styles.mapContainer}>
+        <EventMapComponent
+          eventLocations={events
+            .filter((event) => event.location?.coordinates) // Ensure coordinates exist
+            .map((event) => ({
+              _id: event._id,
+              name: event.title, // Pass the event name
+              latitude: event.location.coordinates.latitude,
+              longitude: event.location.coordinates.longitude,
+            }))}
+        />
+      </div>
+      <div style={headerStyle}>Event List</div>
+      <div style={cardListStyle}>
         {currentEvents.map((event) => (
-          <div key={event._id} style={eventBoxStyle}>
+          <div key={event._id} style={eventCardStyle}>
             <h2 style={eventTitleStyle}>{event.title}</h2>
-            <p style={eventDateStyle}>
+            <p style={eventDetailStyle}>
               Date: {new Date(event.start_date).toLocaleDateString()} -{' '}
               {new Date(event.end_date).toLocaleDateString()}
             </p>
-            <p style={eventLocationStyle}>Location: {event.location?.address || 'Unknown'}</p>
-            <Link href={`/event/`} passHref>
+            <p style={eventDetailStyle}>
+              Location: {event.location?.address || 'Unknown'}
+            </p>
+            <Link href={`/event?id=${event._id}`} passHref>
               <button
-                onClick={() => handleEventClick(event._id)}
                 style={{
                   padding: '10px 20px',
                   backgroundColor: '#54473F',
@@ -177,3 +186,15 @@ const Event: React.FC = () => {
 };
 
 export default Event;
+
+const styles = {
+  mapContainer: {
+    width: '100%',
+    maxWidth: '800px',
+    height: '400px',
+    borderRadius: '15px',
+    overflow: 'hidden',
+    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
+    marginBottom: '20px',
+  },
+};

@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -15,6 +16,7 @@ const certificateRoutes = require("./routes/certificateRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const registrationRoutes = require("./routes/registrationRoutes");
 
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -29,6 +31,7 @@ app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
 app.use("/associations", associationRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 

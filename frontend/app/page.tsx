@@ -17,8 +17,10 @@ const Home: React.FC = () => {
         </Link>
         <Link href="/profile"></Link>
         <Link href="/event"></Link>
+        <Link href="/eventCreate"></Link>
         <Link href="/uploadTreePhoto"></Link>
         <Link href="/events"></Link>
+        <Link href="/registerassociation">Register Association</Link>
       </nav>
       <Link href="/login">
       <button style={styles.startButton}>Start</button>
@@ -37,6 +39,7 @@ const styles: { [key: string]: CSSProperties } = {
     backgroundColor: '#f0f4f8',
     textAlign: 'center',
     padding: '20px',
+    backgroundImage: 'url(/start-screen.jpg)',
   },
   header: {
     fontSize: '3rem',
@@ -68,12 +71,13 @@ const styles: { [key: string]: CSSProperties } = {
   },
   startButton: {
     padding: '15px 30px',
-    backgroundColor: '#CBD2A4',
+    backgroundColor: '#62825D',
     color: 'white',
     fontSize: '1.5rem',
     borderRadius: '30px',
     textDecoration: 'none',
-    transition: 'background-color 0.3s',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+    transition: 'background-color 0.3s, transform 0.3s',
   },
 };
 
