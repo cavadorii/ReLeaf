@@ -124,14 +124,26 @@ const UploadTreePhoto: React.FC = () => {
         });
   
         if (response.ok) {
-          alert('Photo metadata saved successfully.');
-          router.push('/plantMe');
+          // Award 5 points to the user
+          const pointsResponse = await fetch(`http://localhost:5000/api/users/award-points`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, points: 5 }),
+          });
+  
+          if (pointsResponse.ok) {
+            alert('Photo metadata saved successfully. You have been awarded 5 points!');
+            router.push('/plantMe');
+          } else {
+            console.error('Failed to award points to the user.');
+            alert('Photo metadata saved successfully, but points could not be awarded.');
+          }
         } else {
           const errorData = await response.json();
           console.error('Error:', errorData);
-          alert('Failed to save photo metadata to database.');
+          alert('Failed to save photo metadata to the database.');
         }
-      } catch (error) {
+      }catch (error) {
         console.error('Error:', error);
         alert('An error occurred while processing the request.');
       } finally {

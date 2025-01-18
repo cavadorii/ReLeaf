@@ -9,7 +9,7 @@ const Certificate = {
    * @returns {Object} - The inserted certificate.
    */
   create: async (certificate) => {
-    certificate.issued_at = new Date().toISOString();
+    certificate.issued_at = new Date();
     const result = await certificateCollection.insertOne(certificate);
     return result;
   },
@@ -57,7 +57,7 @@ const Certificate = {
    * @returns {Array} - A list of certificates.
    */
   findByUserId: async (userId) => {
-    return await certificateCollection.find({ user_id: userId }).toArray();
+    return await certificateCollection.find({ userId: userId }).toArray();
   },
 
   /**

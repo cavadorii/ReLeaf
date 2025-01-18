@@ -10,8 +10,8 @@ import { format } from 'date-fns';
 
 interface Certificate {
   _id: string;
-  user_id: { name: string };
-  event_id: { title: string };
+  userId: { name: string };
+  eventId: { title: string };
   issued_at: string;
 }
 
@@ -46,9 +46,9 @@ const CertificatePage: React.FC = () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/certificates/${certificateId}`);
         setCertificate(response.data);
-        const user = await axios.get(`http://localhost:5000/api/users/${response.data.user_id}`);
+        const user = await axios.get(`http://localhost:5000/api/users/${response.data.userId}`);
         setUserName(user.data.username);
-        const event = await axios.get(`http://localhost:5000/api/events/${response.data.event_id}`);
+        const event = await axios.get(`http://localhost:5000/api/events/${response.data.eventId}`);
         setEventDetails(event.data);
       } catch (err: any) {
         console.error('Error fetching certificate:', err);

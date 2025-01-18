@@ -9,9 +9,11 @@ const EventDetails: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isVolunteer, setIsVolunteer] = useState<boolean>(false);
+  const [treesPlanted, setTreesPlanted] = useState<number>(0);
   const [isJoined, setIsJoined] = useState<boolean>(false);
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
   const [volunteerList, setVolunteerList] = useState<any[]>([]);
+  const [volunteerLeaderboard, setVolunteerLeaderboard] = useState<any[]>([]);
   const searchParams = useSearchParams();
   const eventId = searchParams.get('id');
   const router = useRouter();
@@ -26,26 +28,26 @@ const EventDetails: React.FC = () => {
       }
       try {
         setLoading(true);
-
+  
         // 1) Fetch the logged-in user
         const userResponse = await axios.get(`http://localhost:5000/api/users/${userId}`);
         if (userResponse.status !== 200) throw new Error('User not found');
         if (userResponse.data.role === 'volunteer') setIsVolunteer(true);
-
+  
         // 2) Fetch the event
         const eventResponse = await axios.get(`http://localhost:5000/api/events/${eventId}`);
         if (eventResponse.status !== 200) throw new Error('Error fetching event details');
         const eventData = eventResponse.data;
         setEvent(eventData);
-
+  
         // 3) Check if current user is already in volunteers
         const volunteers = eventData.volunteers || [];
         setIsJoined(volunteers.some((v: any) => v.user_id === userId));
-
+  
         // 4) Fetch the list of volunteers from the new volunteers route
         const volunteersResponse = await axios.get(`http://localhost:5000/api/events/${eventId}/volunteers`);
         const volunteersRaw = volunteersResponse.data;
-
+  
         // 5) For each volunteer, fetch username from your new endpoint
         const volunteersWithNames = await Promise.all(
           volunteersRaw.map(async (vol: any) => {
@@ -58,6 +60,34 @@ const EventDetails: React.FC = () => {
           })
         );
         setVolunteerList(volunteersWithNames);
+  
+        // 6) Fetch tree photos and calculate the count
+        const photosResponse = await axios.get('http://localhost:5000/api/tree-photos');
+        const photos = photosResponse.data?.data || [];
+        const filteredPhotos = photos.filter(
+          (photo: { event_id: string; user_id: string; is_valid: boolean; }) => photo.event_id === eventId && photo.user_id === userId && photo.is_valid === true
+        );
+        setTreesPlanted(filteredPhotos.length);
+
+
+        // 7) Set leaderboard
+        const volunteersWithTreeCounts = await Promise.all(
+          volunteers.map(async (vol: any) => {
+            const treePhotos = photos.filter(
+              (photo: { event_id: string; user_id: string; is_valid: boolean }) =>
+                photo.event_id === eventId && photo.user_id === vol.user_id && photo.is_valid
+            );
+            const usernameResponse = await axios.get(`http://localhost:5000/api/users/username/${vol.user_id}`);
+            return {
+              userId: vol.user_id,
+              username: usernameResponse.data?.username || 'Unknown User',
+              treesPlanted: treePhotos.length,
+            };
+          })
+        );
+
+        const sortedVolunteers = volunteersWithTreeCounts.sort((a, b) => b.treesPlanted - a.treesPlanted);
+        setVolunteerLeaderboard(sortedVolunteers);
 
       } catch (err: any) {
         setError(err.message);
@@ -89,7 +119,7 @@ const EventDetails: React.FC = () => {
 
       // 2) Create the registration record
       const registration = { event_id: _id, user_id: userId, status: 'Accepted', points_awarded: 0 };
-      const addRegistrationResponse = await axios.post(`http://localhost:5000/api/registrations`, registration);
+      const addRegistrationResponse = await axios.post("http://localhost:5000/api/registrations", registration);
 
       if (updateResponse.status === 200 && addRegistrationResponse.status === 201) {
         setIsJoined(true);
@@ -106,6 +136,7 @@ const EventDetails: React.FC = () => {
       setError(err.message);
     }
   };
+
 
   const handleBack = () => {
     router.back();
@@ -213,6 +244,20 @@ const EventDetails: React.FC = () => {
     fontFamily: '"Quicksand", sans-serif',
     fontSize: '15px',
   };
+  const leaderboardContainerStyle: React.CSSProperties = {
+    marginTop: '20px',
+    textAlign: 'left',
+    color: '#333',
+  };
+
+  const leaderboardItemStyle: React.CSSProperties = {
+    backgroundColor: '#eee',
+    margin: '5px 0',
+    padding: '10px',
+    borderRadius: '5px',
+    fontFamily: '"Quicksand", sans-serif',
+    fontSize: '15px',
+  };
 
   return (
     <div style={containerStyle}>
@@ -227,6 +272,10 @@ const EventDetails: React.FC = () => {
           Date: {new Date(event.start_date).toLocaleDateString()} - {new Date(event.end_date).toLocaleDateString()}
         </p>
 
+        <p style={detailStyle}>
+        Trees Planted: {treesPlanted}
+      </p>
+
         <button
           style={joinButtonStyle}
           onClick={handleJoinEvent}
@@ -235,25 +284,26 @@ const EventDetails: React.FC = () => {
           {isJoined ? 'Already Joined' : 'Join Event'}
         </button>
 
-        {isJoined && (
+        {isJoined && new Date(event.end_date) >= new Date() ? (
           <button style={uploadTreePhotoButtonStyle} onClick={handleUploadTreePhoto}>
             Upload Tree Photo
           </button>
+        ) : (
+          <p style={{ color: '#FF0000', marginTop: '20px' }}>Event finished</p>
         )}
+
+
 
         {popupMessage && <div style={popupStyle}>{popupMessage}</div>}
 
-        {volunteerList.length > 0 && (
-          <div style={volunteersContainerStyle}>
-            <h2 style={{ fontFamily: '"Quicksand", sans-serif' }}>Volunteers</h2>
-            {volunteerList.map((v, idx) => (
-              <div key={idx} style={volunteerItemStyle}>
-                <strong>Name:</strong> {v.username || 'Unknown User'} <br />
-                <strong>Status:</strong> {v.status}
-              </div>
-            ))}
-          </div>
-        )}
+        <div style={leaderboardContainerStyle}>
+          <h2>Leaderboard</h2>
+          {volunteerLeaderboard.map((vol, idx) => (
+            <div key={idx} style={leaderboardItemStyle}>
+              {idx + 1}. {vol.username}: {vol.treesPlanted} trees
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
