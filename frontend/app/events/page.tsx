@@ -1,6 +1,11 @@
-'use client'; 
+'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const EventMapComponent = dynamic(() => import('../components/EventMapComponent'), {
+  ssr: false,
+});
 
 const Event: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
@@ -18,7 +23,7 @@ const Event: React.FC = () => {
     padding: '20px',
     fontFamily: '"Quicksand", sans-serif',
     minHeight: '100vh',
-    background: 'linear-gradient(to bottom, #B1C29E, #659287)'
+    background: 'linear-gradient(to bottom, #B1C29E, #659287)',
   };
 
   const headerStyle: React.CSSProperties = {
@@ -119,6 +124,19 @@ const Event: React.FC = () => {
   return (
     <div style={containerStyle}>
       <div style={headerStyle}>Upcoming Events</div>
+      <div style={styles.mapContainer}>
+        <EventMapComponent
+          eventLocations={events
+            .filter((event) => event.location?.coordinates) // Ensure coordinates exist
+            .map((event) => ({
+              _id: event._id,
+              name: event.title, // Pass the event name
+              latitude: event.location.coordinates.latitude,
+              longitude: event.location.coordinates.longitude,
+            }))}
+        />
+      </div>
+      <div style={headerStyle}>Event List</div>
       <div style={cardListStyle}>
         {currentEvents.map((event) => (
           <div key={event._id} style={eventCardStyle}>
@@ -168,3 +186,15 @@ const Event: React.FC = () => {
 };
 
 export default Event;
+
+const styles = {
+  mapContainer: {
+    width: '100%',
+    maxWidth: '800px',
+    height: '400px',
+    borderRadius: '15px',
+    overflow: 'hidden',
+    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
+    marginBottom: '20px',
+  },
+};
