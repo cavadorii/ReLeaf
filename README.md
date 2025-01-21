@@ -60,9 +60,24 @@ Follow these steps to get started with ReLeaf:
 
 ## 🖼 Screenshots
 
-Add screenshots of ReLeaf here! 🌟
+Screenshots of ReLeaf here! 🌟
 
-Caption: Placeholder for app images.
+
+### Home Page
+![Home Page](https://i.ibb.co/7ygTpHX/home.png)
+
+### Profile Page
+![Profile Page](https://i.ibb.co/yqGNSG7/profile.png)
+
+### Upload Tree Image Page
+![Upload Tree Image Page](https://i.ibb.co/mR1Hyz1/upload-tree.png)
+
+### Event Page
+![Event Page](https://i.ibb.co/zSdffqL/event-details.png)
+
+### Event Create Page
+![Event Create Page](https://i.ibb.co/d4t2myj/event-create.png)
+
 
 ## 🌈 Contribute
 
